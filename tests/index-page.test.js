@@ -2,8 +2,19 @@ const assert = require('assert')
 
 let pageDefinition
 const memory = new Map()
+const calls = { navigations: [], modals: [] }
+let confirmModal = false
 global.Page = definition => { pageDefinition = definition }
-global.wx = { getStorageSync: key => memory.get(key), pageScrollTo() {} }
+global.wx = {
+  getStorageSync: key => memory.get(key),
+  removeStorageSync: key => memory.delete(key),
+  pageScrollTo() {},
+  navigateTo({ url }) { calls.navigations.push(url) },
+  showModal(options) {
+    calls.modals.push(options)
+    options.success({ confirm: confirmModal, cancel: !confirmModal })
+  }
+}
 
 require('../miniprogram/pages/index/index')
 
@@ -73,5 +84,16 @@ pageWithDraft.onShow()
 const paperWithDraft = pageWithDraft.data.papers.find(item => item.id === draftPaperId)
 assert.strictEqual(paperWithDraft.hasDraft, true)
 assert.strictEqual(paperWithDraft.draftAnsweredCount, 2)
+
+pageWithDraft.startPaper({ currentTarget: { dataset: { paper: draftPaperId } } })
+assert.strictEqual(calls.modals.length, 1)
+assert.strictEqual(calls.modals[0].title, '重新开始整卷？')
+assert.strictEqual(calls.navigations.length, 0)
+assert.strictEqual(memory.has(`corn_exam_draft_v1:${draftPaperId}:paper:all`), true)
+
+confirmModal = true
+pageWithDraft.startPaper({ currentTarget: { dataset: { paper: draftPaperId } } })
+assert.strictEqual(memory.has(`corn_exam_draft_v1:${draftPaperId}:paper:all`), false)
+assert.strictEqual(calls.navigations[0], `/packages/${draftPaperId}/exam/exam?mode=paper`)
 
 console.log('index-page.test.js: OK')

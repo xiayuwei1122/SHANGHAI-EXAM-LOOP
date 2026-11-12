@@ -130,7 +130,20 @@ Page({
 
   startPaper(event) {
     const paperId = event.currentTarget.dataset.paper
-    wx.navigateTo({ url: `/packages/${paperId}/exam/exam?mode=paper` })
+    const paper = (this.allPapers || []).find(item => item.id === paperId)
+    const url = `/packages/${paperId}/exam/exam?mode=paper`
+    if (!paper?.hasDraft) {
+      wx.navigateTo({ url })
+      return
+    }
+    this.confirmRestart({
+      title: '重新开始整卷？',
+      content: '重新开始会清除这套试卷的未完成进度，并从第 1 题开始。想接着做，可以去练习记录点“继续整卷”。',
+      onConfirm: () => {
+        storage.clearDraft(paperId, 'paper', '')
+        wx.navigateTo({ url })
+      }
+    })
   },
 
   chooseModule(event) {
@@ -141,7 +154,7 @@ Page({
       return {
         ...module,
         hasDraft: Boolean(draft),
-        progressText: draft ? `继续 · 已答 ${answeredCount}/${module.questionCount}` : `${module.questionCount} 题`
+        progressText: draft ? `已有进度 ${answeredCount}/${module.questionCount} · 重新开始` : `${module.questionCount} 题`
       }
     })
     this.setData({ selectedPaper: { ...paper, modules }, showModules: true })
@@ -152,8 +165,35 @@ Page({
   startModule(event) {
     const paperId = this.data.selectedPaper.id
     const moduleId = event.currentTarget.dataset.module
-    this.setData({ showModules: false })
-    wx.navigateTo({ url: `/packages/${paperId}/exam/exam?mode=module&moduleId=${moduleId}` })
+    const module = this.data.selectedPaper.modules.find(item => item.id === moduleId)
+    const url = `/packages/${paperId}/exam/exam?mode=module&moduleId=${moduleId}`
+    const openModule = () => {
+      this.setData({ showModules: false })
+      wx.navigateTo({ url })
+    }
+    if (!module?.hasDraft) {
+      openModule()
+      return
+    }
+    this.confirmRestart({
+      title: '重新开始这个模块？',
+      content: '重新开始会清除这个模块的未完成进度。想接着做，可以去练习记录点“继续模块”。',
+      onConfirm: () => {
+        storage.clearDraft(paperId, 'module', moduleId)
+        openModule()
+      }
+    })
+  },
+
+  confirmRestart({ title, content, onConfirm }) {
+    wx.showModal({
+      title,
+      content,
+      cancelText: '保留进度',
+      confirmText: '重新开始',
+      confirmColor: '#a64132',
+      success: result => { if (result.confirm) onConfirm() }
+    })
   },
 
   openHistory() { wx.navigateTo({ url: '/pages/history/history' }) },
