@@ -1,0 +1,35 @@
+<view class="exam-page" wx:if="{{question}}">
+  <view class="exam-top">
+    <view class="top-title"><text>{{title}}</text><label>{{paperTitle}}</label></view>
+    <view class="timer"><label>{{timerLabel}}</label><text>{{timerText}}</text></view>
+  </view>
+  <view class="progress"><view style="width: {{current / total * 100}}%"></view></view>
+  <view class="progress-meta"><text>第 {{current}} / {{total}} 题</text><text bindtap="openSheet">答题卡：{{answeredCount}} 已答 · {{guessedCount}} 蒙</text></view>
+  <view class="material card" wx:if="{{material}}">
+    <view class="material-label">材料</view><text selectable="true">{{material.text}}</text>
+    <image wx:for="{{material.images}}" wx:key="*this" src="{{item}}" mode="widthFix" />
+  </view>
+  <view class="question card">
+    <view class="question-head"><view class="number">{{question.number}}</view><view class="pill">{{question.type}}{{question.multi ? ' · 多选' : ''}}</view></view>
+    <view class="stem" selectable="true">{{question.stem}}</view>
+    <image class="question-image" wx:for="{{question.images}}" wx:key="*this" src="{{item}}" mode="widthFix" />
+    <view class="options">
+      <view class="option {{item.selected ? 'active' : ''}}" wx:for="{{question.options}}" wx:key="key" data-choice="{{item.key}}" bindtap="chooseOption">
+        <view class="option-key">{{item.key}}</view>
+        <view class="option-content"><text selectable="true">{{item.text}}</text><image wx:for="{{item.images}}" wx:key="*this" src="{{item}}" mode="widthFix" /></view>
+      </view>
+    </view>
+    <view class="guess-toggle {{guessed ? 'active' : ''}}" bindtap="toggleGuess">
+      <view class="check">{{guessed ? '✓' : ''}}</view><view><text>这题是蒙的</text><label>即使蒙对，交卷后也会进入复盘</label></view>
+    </view>
+  </view>
+  <view class="bottom-actions"><button class="btn" bindtap="previous" disabled="{{current === 1}}">上一题</button><button class="btn btn-primary" bindtap="next">{{current === total ? '交卷' : '下一题'}}</button></view>
+  <view class="mask" wx:if="{{showSheet}}" bindtap="closeSheet">
+    <view class="sheet" catchtap="stopBubble">
+      <view class="sheet-head"><view><text>答题卡</text><label>{{answeredCount}} / {{total}} 已答</label></view><button bindtap="closeSheet">×</button></view>
+      <view class="legend"><text>● 已答</text><text>◆ 蒙题</text></view>
+      <view class="answer-grid"><view class="cell {{item.answered ? 'answered' : ''}} {{item.guessed ? 'guessed' : ''}} {{item.current ? 'current' : ''}}" wx:for="{{answerCells}}" wx:key="index" data-index="{{item.index}}" bindtap="jumpQuestion">{{item.number}}</view></view>
+      <button class="btn btn-primary submit-btn" bindtap="confirmSubmit">现在交卷</button>
+    </view>
+  </view>
+</view>

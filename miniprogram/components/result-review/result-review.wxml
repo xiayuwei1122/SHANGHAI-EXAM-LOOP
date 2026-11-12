@@ -1,0 +1,36 @@
+<view class="page result-page" wx:if="{{record}}">
+  <view class="score-card card">
+    <view class="score-label">本轮训练分</view><view class="score">{{result.trainingScore}}<text>分</text></view>
+    <view class="paper-name">{{record.paperTitle}} · {{record.moduleName}}</view>
+    <view class="summary-grid">
+      <view><text>{{result.correct}}</text><label>答对</label></view><view><text>{{result.wrong}}</text><label>答错</label></view>
+      <view><text>{{result.blank}}</text><label>未答</label></view><view><text>{{result.guessedCorrect}}/{{result.guessed}}</text><label>蒙对/蒙题</label></view>
+    </view>
+    <view class="duration">本次用时 {{durationText}} · {{result.unscored}} 题不计分</view>
+  </view>
+  <view class="module-card card" wx:if="{{result.modules.length > 1}}">
+    <view class="card-title">模块表现</view>
+    <view class="module-row" wx:for="{{result.modules}}" wx:key="id"><view><text>{{item.name}}</text><label>{{item.correct}} / {{item.total}}</label></view><view class="bar"><view style="width: {{item.score}}%"></view></view><strong>{{item.score}}</strong></view>
+  </view>
+  <view class="review-head">
+    <view><text>逐题复盘</text><label>蒙对不等于掌握</label></view>
+    <view class="filters"><view class="{{activeFilter === item.id ? 'active' : ''}}" wx:for="{{filters}}" wx:key="id" data-filter="{{item.id}}" bindtap="changeFilter">{{item.name}}</view></view>
+  </view>
+  <view class="empty card" wx:if="{{!reviewItems.length}}">这一组没有符合条件的题目 🎉</view>
+  <view class="review-list">
+    <view class="review-card card" wx:for="{{reviewItems}}" wx:key="questionId">
+      <view class="review-title" data-id="{{item.questionId}}" bindtap="toggleItem">
+        <view class="number">{{item.question.number}}</view><view class="review-name"><text>{{item.question.type}}</text><label>{{item.question.moduleName}}</label></view>
+        <view class="status {{item.status}}">{{item.statusText}}{{item.guessed ? ' · 蒙' : ''}}</view><view class="arrow">{{expanded[item.questionId] ? '⌃' : '⌄'}}</view>
+      </view>
+      <view class="review-body" wx:if="{{expanded[item.questionId]}}">
+        <view class="material" wx:if="{{item.material}}">{{item.material.text}}</view><view class="stem">{{item.question.stem}}</view>
+        <image wx:for="{{item.question.images}}" wx:key="*this" src="{{item}}" mode="widthFix" />
+        <view class="answer-line"><text>你的答案：<b>{{item.userAnswer || '未答'}}</b></text><text>参考答案：<b>{{item.answer || '争议/缺失'}}</b></text></view>
+        <view class="option {{option.userSelected ? 'user' : ''}} {{option.right ? 'right' : ''}}" wx:for="{{item.question.options}}" wx:for-item="option" wx:key="key"><text>{{option.key}}</text><label>{{option.text}}</label></view>
+        <view class="analysis"><view>解析</view><text selectable="true">{{item.question.explanation}}</text></view>
+      </view>
+    </view>
+  </view>
+  <view class="result-actions"><button class="btn" bindtap="backHome">返回首页</button><button class="btn btn-primary" bindtap="retry">再刷一次</button></view>
+</view>

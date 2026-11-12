@@ -1,0 +1,12 @@
+<view class="page history-page">
+  <view class="history-title">练习记录</view>
+  <view class="history-subtitle">每一次重刷都保留，不覆盖以前的成绩。</view>
+  <view class="empty card" wx:if="{{!history.length}}">还没有练习记录，先去刷一套吧 🌽</view>
+  <view class="history-list">
+    <view class="history-card card" wx:for="{{history}}" wx:key="id" data-id="{{item.id}}" bindtap="openRecord">
+      <view class="score">{{item.trainingScore}}<text>分</text></view>
+      <view class="record-info"><text>{{item.paperTitle}}</text><label>{{item.moduleName}} · {{item.correct}}/{{item.total}} · 用时 {{item.durationText}}</label><small>{{item.dateText}} · 蒙对 {{item.guessedCorrect}}/{{item.guessed}}</small></view>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+</view>

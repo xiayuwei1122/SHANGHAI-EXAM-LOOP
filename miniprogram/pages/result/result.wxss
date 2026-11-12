@@ -1,0 +1,53 @@
+.result-page { padding-bottom: 150rpx; }
+.score-card { padding: 38rpx 30rpx; color: #fffaf3; background: linear-gradient(145deg, #362e29, #4a3b32); text-align: center; }
+.score-label { color: #d7c9be; font-size: 23rpx; }
+.score { margin-top: 3rpx; color: #f0c66e; font-family: Georgia, serif; font-size: 108rpx; font-weight: 800; line-height: 1.1; }
+.score text { margin-left: 7rpx; font-size: 26rpx; }
+.paper-name { color: #eee3d8; font-size: 25rpx; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10rpx; margin-top: 30rpx; }
+.summary-grid view { padding: 17rpx 5rpx; border-radius: 18rpx; background: rgba(255,255,255,.08); }
+.summary-grid text { display: block; font-size: 34rpx; font-weight: 800; }
+.summary-grid label { display: block; margin-top: 4rpx; color: #d3c6bc; font-size: 20rpx; }
+.duration { margin-top: 20rpx; color: #cfc1b6; font-size: 21rpx; }
+.module-card { margin-top: 22rpx; padding: 28rpx; }
+.card-title { margin-bottom: 20rpx; font-size: 30rpx; font-weight: 800; }
+.module-row { display: grid; grid-template-columns: 190rpx 1fr 48rpx; align-items: center; gap: 15rpx; margin: 17rpx 0; }
+.module-row text { display: block; font-size: 24rpx; font-weight: 700; }
+.module-row label { display: block; color: var(--muted); font-size: 19rpx; }
+.module-row strong { color: var(--red); text-align: right; }
+.bar { height: 12rpx; border-radius: 99rpx; overflow: hidden; background: #e8dfd4; }
+.bar view { height: 100%; border-radius: 99rpx; background: linear-gradient(90deg, var(--gold), var(--red)); }
+.review-head { margin: 38rpx 0 18rpx; }
+.review-head > view:first-child text { display: block; font-family: "Songti SC", serif; font-size: 38rpx; font-weight: 800; }
+.review-head > view:first-child label { display: block; margin-top: 4rpx; color: var(--muted); font-size: 22rpx; }
+.filters { display: flex; gap: 10rpx; margin-top: 20rpx; overflow: auto; }
+.filters view { flex: none; padding: 11rpx 21rpx; border-radius: 999rpx; color: var(--muted); background: #eae1d6; font-size: 23rpx; }
+.filters view.active { color: white; background: var(--red); }
+.review-list { display: flex; flex-direction: column; gap: 16rpx; }
+.review-card { overflow: hidden; }
+.review-title { display: flex; align-items: center; gap: 14rpx; padding: 22rpx; }
+.number { display: grid; place-items: center; flex: none; width: 50rpx; height: 50rpx; border-radius: 15rpx; color: white; background: #342d28; font-size: 23rpx; font-weight: 800; }
+.review-name { flex: 1; min-width: 0; }
+.review-name text { display: block; font-size: 25rpx; font-weight: 800; }
+.review-name label { display: block; margin-top: 3rpx; color: var(--muted); font-size: 20rpx; }
+.status { padding: 7rpx 12rpx; border-radius: 999rpx; color: var(--red-dark); background: #f3dfdc; font-size: 20rpx; font-weight: 800; }
+.status.correct { color: var(--green); background: #e2eee6; }
+.status.guessed-correct { color: #7a5a20; background: #fae8bd; }
+.status.unscored { color: var(--muted); background: #eee7df; }
+.arrow { color: var(--muted); }
+.review-body { padding: 0 23rpx 26rpx; border-top: 1rpx solid var(--line); }
+.review-body .material { margin-top: 20rpx; padding: 18rpx; border-radius: 15rpx; color: #5f554d; background: #f3ede5; font-size: 23rpx; line-height: 1.65; white-space: pre-wrap; }
+.stem { margin-top: 22rpx; font-size: 27rpx; line-height: 1.7; white-space: pre-wrap; }
+.review-body image { width: 100%; margin-top: 14rpx; }
+.answer-line { display: flex; flex-wrap: wrap; gap: 25rpx; margin: 20rpx 0; font-size: 24rpx; }
+.answer-line b { color: var(--red); }
+.option { display: flex; gap: 14rpx; margin-top: 10rpx; padding: 15rpx; border: 1rpx solid var(--line); border-radius: 14rpx; font-size: 23rpx; }
+.option > text { flex: none; font-weight: 800; }
+.option.user { border-color: #d49a8f; background: #f8ebe8; }
+.option.right { border-color: #8eb29a; background: #e8f2eb; }
+.option label { line-height: 1.5; }
+.analysis { margin-top: 22rpx; padding: 20rpx; border-left: 7rpx solid var(--gold); border-radius: 0 15rpx 15rpx 0; background: #fbf4e5; }
+.analysis view { margin-bottom: 7rpx; color: #805c1f; font-size: 23rpx; font-weight: 800; }
+.analysis text { color: #594c3a; font-size: 24rpx; line-height: 1.7; }
+.empty { padding: 45rpx; text-align: center; color: var(--muted); }
+.result-actions { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1.4fr; gap: 16rpx; padding: 18rpx 28rpx calc(18rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--line); background: rgba(255,253,248,.96); }

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/history/history"
+  ],
+  "subpackages": [
+    { "root": "packages/sh-2019-a", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2019-b", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2020-a", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2020-b", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2021-a", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2021-b", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2022-b", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2023-a", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2025-a", "pages": ["exam/exam", "result/result"] },
+    { "root": "packages/sh-2025-b", "pages": ["exam/exam", "result/result"] }
+  ],
+  "window": {
+    "navigationBarTitleText": "玉米的市考训练场",
+    "navigationBarBackgroundColor": "#fffaf0",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f6f1e8",
+    "backgroundTextStyle": "dark"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

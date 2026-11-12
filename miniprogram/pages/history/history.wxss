@@ -1,0 +1,12 @@
+.history-title { margin-top: 10rpx; font-family: "Songti SC", serif; font-size: 50rpx; font-weight: 800; }
+.history-subtitle { margin-top: 7rpx; color: var(--muted); font-size: 24rpx; }
+.history-list { display: flex; flex-direction: column; gap: 16rpx; margin-top: 30rpx; }
+.history-card { display: flex; align-items: center; gap: 20rpx; padding: 24rpx; }
+.score { flex: none; width: 105rpx; color: var(--red); font-family: Georgia, serif; font-size: 46rpx; font-weight: 800; text-align: center; }
+.score text { font-size: 19rpx; }
+.record-info { flex: 1; min-width: 0; }
+.record-info text { display: block; font-size: 26rpx; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.record-info label, .record-info small { display: block; margin-top: 6rpx; color: var(--muted); font-size: 21rpx; }
+.record-info small { color: #987940; }
+.arrow { color: #a99a8b; font-size: 42rpx; }
+.empty { margin-top: 35rpx; padding: 60rpx 20rpx; color: var(--muted); text-align: center; }

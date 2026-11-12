@@ -1,0 +1,4 @@
+{
+  "desc": "开发版自用",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

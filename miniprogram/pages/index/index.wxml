@@ -1,0 +1,47 @@
+<view class="page home-page">
+  <view class="hero card">
+    <view class="corn">🌽</view>
+    <view class="eyebrow">SHANGHAI EXAM LOOP</view>
+    <view class="hero-title">把一套题刷透，<br/>比盲目追新题更重要。</view>
+    <view class="hero-note">整卷检验节奏，模块拆解能力。蒙对的题，也会被单独捞出来复盘。</view>
+    <view class="stats">
+      <view class="stat"><text>{{attemptCount}}</text><label>完成轮次</label></view>
+      <view class="stat"><text>{{bestScore}}</text><label>历史最好</label></view>
+      <view class="stat"><text>10</text><label>回忆版试卷</label></view>
+    </view>
+    <button class="btn history-btn" bindtap="openHistory">查看练习记录</button>
+  </view>
+
+  <view class="section-title">选择试卷</view>
+  <view class="paper-list">
+    <view class="paper-card card" wx:for="{{papers}}" wx:key="id">
+      <view class="paper-head">
+        <view>
+          <view class="paper-year">{{item.year}}</view>
+          <view class="paper-name">上海市考行测 {{item.category}} 类</view>
+        </view>
+        <view class="pill {{item.year >= 2025 ? 'validation' : ''}}">{{item.year >= 2025 ? '阶段验收' : '方法训练'}}</view>
+      </view>
+      <view class="paper-meta">{{item.questionCount}} 题 · {{item.answerCount}} 题可评分 · 已刷 {{item.attemptCount}} 次</view>
+      <view class="paper-best" wx:if="{{item.bestScore !== null}}">历史最好：{{item.bestScore}} 分</view>
+      <view class="paper-actions">
+        <button class="btn btn-primary" data-paper="{{item.id}}" bindtap="startPaper">刷整卷</button>
+        <button class="btn btn-ghost" data-paper="{{item.id}}" bindtap="chooseModule">选模块</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="source-note">题库为考生回忆版，非上海官方发布。缺失或争议答案不计入训练分。</view>
+
+  <view class="mask" wx:if="{{showModules}}" bindtap="closeModules">
+    <view class="sheet" catchtap="stopBubble">
+      <view class="sheet-handle"></view>
+      <view class="sheet-title">{{selectedPaper.title}}</view>
+      <view class="sheet-subtitle">选一个模块单独回归</view>
+      <button class="module-row" wx:for="{{selectedPaper.modules}}" wx:key="id" data-module="{{item.id}}" bindtap="startModule">
+        <text>{{item.name}}</text><label>{{item.questionCount}} 题 ›</label>
+      </button>
+      <button class="btn close-btn" bindtap="closeModules">取消</button>
+    </view>
+  </view>
+</view>
