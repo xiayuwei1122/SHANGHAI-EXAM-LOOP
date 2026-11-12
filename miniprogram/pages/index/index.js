@@ -1,9 +1,14 @@
 const { catalog } = require('../../data/index')
 const storage = require('../../utils/storage')
+const { buildYearOptions, filterPapersByYear, getRecordScore } = require('../../utils/paper-filter')
 
 Page({
   data: {
     papers: [],
+    years: [],
+    selectedYear: 'all',
+    yearHint: '',
+    totalPaperCount: catalog.length,
     selectedPaper: null,
     showModules: false,
     attemptCount: 0,
@@ -14,11 +19,31 @@ Page({
     const history = storage.getHistory()
     const papers = catalog.map(paper => {
       const records = history.filter(item => item.paperId === paper.id)
-      const best = records.length ? Math.max(...records.map(item => item.trainingScore)) : null
+      const scores = records.map(getRecordScore).filter(score => score !== null)
+      const best = scores.length ? Math.max(...scores) : null
       return { ...paper, attemptCount: records.length, bestScore: best }
     })
-    const best = history.length ? Math.max(...history.map(item => item.trainingScore)) : null
-    this.setData({ papers, attemptCount: history.length, bestScore: best == null ? '--' : `${best}` })
+    const historyScores = history.map(getRecordScore).filter(score => score !== null)
+    const best = historyScores.length ? Math.max(...historyScores) : null
+    this.allPapers = papers
+    const visiblePapers = filterPapersByYear(papers, this.data.selectedYear)
+    this.setData({
+      papers: visiblePapers,
+      years: buildYearOptions(papers),
+      yearHint: this.getYearHint(this.data.selectedYear, visiblePapers.length),
+      attemptCount: history.length,
+      bestScore: best == null ? '--' : `${best}`
+    })
+  },
+
+  getYearHint(selectedYear, count) {
+    return selectedYear === 'all' ? `全部年份 · ${count} 套` : `${selectedYear} 年 · ${count} 套`
+  },
+
+  selectYear(event) {
+    const selectedYear = String(event.currentTarget.dataset.year)
+    const papers = filterPapersByYear(this.allPapers || [], selectedYear)
+    this.setData({ selectedYear, papers, yearHint: this.getYearHint(selectedYear, papers.length) })
   },
 
   startPaper(event) {

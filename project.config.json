@@ -10,7 +10,7 @@
     "postcss": true,
     "minified": true,
     "enhance": true,
-    "compileHotReLoad": true
+    "compileHotReLoad": false
   },
   "libVersion": "3.16.1",
   "simulatorPluginLibVersion": {}

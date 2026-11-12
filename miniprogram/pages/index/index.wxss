@@ -9,6 +9,15 @@
 .stat text { display: block; font-size: 39rpx; color: #f0c76e; font-weight: 800; }
 .stat label { display: block; margin-top: 5rpx; color: #cfc4ba; font-size: 21rpx; }
 .history-btn { margin-top: 22rpx; color: #fff; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.paper-section-title { display: flex; align-items: baseline; justify-content: space-between; }
+.paper-section-title label { color: var(--muted); font-size: 22rpx; font-weight: 500; }
+.year-scroll { margin-bottom: 20rpx; white-space: nowrap; }
+.year-filter { display: inline-flex; gap: 12rpx; padding: 2rpx 2rpx 8rpx; }
+.year-chip { display: inline-flex; align-items: center; gap: 9rpx; min-width: 104rpx; height: 62rpx; margin: 0; padding: 0 20rpx; border: 2rpx solid var(--line); border-radius: 999rpx; color: var(--muted); background: #fffaf2; font-size: 25rpx; font-weight: 700; line-height: 58rpx; }
+.year-chip::after { border: 0; }
+.year-chip label { display: grid; place-items: center; min-width: 29rpx; height: 29rpx; padding: 0 7rpx; border-radius: 999rpx; color: #8b7869; background: #eee4d8; font-size: 18rpx; line-height: 1; }
+.year-chip.active { color: white; border-color: var(--red); background: var(--red); }
+.year-chip.active label { color: var(--red-dark); background: #f5dca8; }
 .paper-list { display: flex; flex-direction: column; gap: 20rpx; }
 .paper-card { padding: 28rpx; }
 .paper-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; }
