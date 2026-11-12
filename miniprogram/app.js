@@ -1,5 +1,5 @@
 App({
   globalData: {
-    appName: '玉米的考试训练场'
+    appName: '上岸刷题簿'
   }
 })
