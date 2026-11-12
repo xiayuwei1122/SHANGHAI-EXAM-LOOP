@@ -6,8 +6,8 @@
     </view>
   </view>
 
-  <view wx:if="{{drafts.length}}">
-    <view class="record-section-title"><text>未完成练习</text><label>{{drafts.length}} 个进度</label></view>
+  <view wx:if="{{draftCount}}" id="draft-section">
+    <view class="record-section-title"><text>未完成练习</text><label>{{draftCount}} 个进度</label></view>
     <view class="draft-list">
       <view class="draft-card card" wx:for="{{drafts}}" wx:key="id" data-id="{{item.id}}" bindtap="continueDraft">
         <view class="draft-badge">进行中</view>
@@ -15,20 +15,30 @@
         <view class="draft-action">{{item.actionText}} ›</view>
       </view>
     </view>
+    <view class="pagination compact-pagination" wx:if="{{hasDraftPagination}}">
+      <button class="page-button" disabled="{{draftPage <= 1}}" bindtap="previousDraftPage">上一页</button>
+      <view class="page-status"><text>{{draftPage}}</text><label>/ {{draftTotalPages}} 页</label></view>
+      <button class="page-button" disabled="{{draftPage >= draftTotalPages}}" bindtap="nextDraftPage">下一页</button>
+    </view>
   </view>
 
-  <view class="completed-heading" wx:if="{{history.length || drafts.length}}">
-    <view class="record-section-title"><text>已完成记录</text><label>{{history.length}} 条</label></view>
-    <button class="clear-all" wx:if="{{history.length}}" bindtap="clearAllRecords">清空记录</button>
+  <view class="completed-heading" wx:if="{{historyCount || draftCount}}" id="completed-section">
+    <view class="record-section-title"><text>已完成记录</text><label>{{historyCount}} 条</label></view>
+    <button class="clear-all" wx:if="{{historyCount}}" bindtap="clearAllRecords">清空记录</button>
   </view>
 
-  <view class="empty card" wx:if="{{!history.length && !drafts.length}}">还没有练习记录，先去刷一套吧 🌽</view>
-  <view class="completed-empty card" wx:if="{{!history.length && drafts.length}}">还没有交卷记录，完成一套后会显示在这里。</view>
-  <view class="history-list" wx:if="{{history.length}}">
+  <view class="empty card" wx:if="{{!historyCount && !draftCount}}">还没有练习记录，先去刷一套吧 🌽</view>
+  <view class="completed-empty card" wx:if="{{!historyCount && draftCount}}">还没有交卷记录，完成一套后会显示在这里。</view>
+  <view class="history-list" wx:if="{{historyCount}}">
     <view class="history-card card" wx:for="{{history}}" wx:key="id" data-id="{{item.id}}" bindtap="openRecord">
       <view class="score">{{item.trainingScore}}<text>分</text></view>
       <view class="record-info"><text>{{item.paperTitle}}</text><label>{{item.moduleName}} · {{item.correct}}/{{item.total}} · 用时 {{item.durationText}}</label><small>{{item.dateText}} · 蒙对 {{item.guessedCorrect}}/{{item.guessed}}</small></view>
       <button class="delete-record" data-id="{{item.id}}" catchtap="deleteRecord">删除</button>
     </view>
+  </view>
+  <view class="pagination" wx:if="{{hasHistoryPagination}}">
+    <button class="page-button" disabled="{{historyPage <= 1}}" bindtap="previousHistoryPage">上一页</button>
+    <view class="page-status"><text>{{historyPage}}</text><label>/ {{historyTotalPages}} 页</label></view>
+    <button class="page-button" disabled="{{historyPage >= historyTotalPages}}" bindtap="nextHistoryPage">下一页</button>
   </view>
 </view>

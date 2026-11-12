@@ -24,3 +24,11 @@
 .delete-record { flex: none; min-width: 88rpx; min-height: 56rpx; margin: 0; padding: 0 14rpx; border: 1rpx solid var(--line); border-radius: 16rpx; color: var(--muted); background: transparent; font-size: 21rpx; line-height: 56rpx; }
 .empty { margin-top: 35rpx; padding: 60rpx 20rpx; color: var(--muted); text-align: center; }
 .completed-empty { padding: 34rpx 20rpx; color: var(--muted); font-size: 23rpx; text-align: center; }
+.pagination { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18rpx; margin-top: 26rpx; }
+.compact-pagination { margin: 20rpx 0 4rpx; }
+.page-button { min-height: 64rpx; margin: 0; padding: 0 20rpx; border: 1rpx solid var(--line); border-radius: 18rpx; color: var(--red-dark); background: #fffaf2; font-size: 23rpx; font-weight: 700; line-height: 64rpx; }
+.page-button::after { border: 0; }
+.page-button[disabled] { color: #b7aaa0; background: #eee8df; opacity: .7; }
+.page-status { min-width: 108rpx; color: var(--muted); text-align: center; }
+.page-status text { color: var(--red); font-family: Georgia, serif; font-size: 30rpx; font-weight: 800; }
+.page-status label { margin-left: 7rpx; font-size: 21rpx; }

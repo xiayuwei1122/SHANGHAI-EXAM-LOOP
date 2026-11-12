@@ -1,7 +1,23 @@
 const { catalog } = require('../../data/index')
 const storage = require('../../utils/storage')
 
+const DRAFT_PAGE_SIZE = 4
+const HISTORY_PAGE_SIZE = 6
+
 function duration(seconds) { return `${Math.floor(seconds / 60)}分${seconds % 60 ? `${seconds % 60}秒` : ''}` }
+
+function paginate(items, requestedPage, pageSize) {
+  const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
+  const currentPage = Math.min(Math.max(Number(requestedPage) || 1, 1), totalPages)
+  const start = (currentPage - 1) * pageSize
+  return {
+    items: items.slice(start, start + pageSize),
+    count: items.length,
+    currentPage,
+    totalPages,
+    hasPagination: totalPages > 1
+  }
+}
 
 function draftSummary(paper, mode, module) {
   const moduleId = module?.id || ''
@@ -38,7 +54,18 @@ function getDrafts() {
 }
 
 Page({
-  data: { history: [], drafts: [] },
+  data: {
+    history: [],
+    historyCount: 0,
+    historyPage: 1,
+    historyTotalPages: 1,
+    hasHistoryPagination: false,
+    drafts: [],
+    draftCount: 0,
+    draftPage: 1,
+    draftTotalPages: 1,
+    hasDraftPagination: false
+  },
 
   loadPageData() {
     const history = storage.getHistory().map(item => ({
@@ -46,10 +73,53 @@ Page({
       dateText: new Date(item.submittedAt).toLocaleString('zh-CN'),
       durationText: duration(item.elapsedSeconds)
     }))
-    this.setData({ history, drafts: getDrafts() })
+    this.allHistory = history
+    this.allDrafts = getDrafts()
+    this.updatePageSlices(this.data.draftPage, this.data.historyPage)
   },
 
   onShow() { this.loadPageData() },
+
+  updatePageSlices(requestedDraftPage, requestedHistoryPage) {
+    const draftPage = paginate(this.allDrafts || [], requestedDraftPage, DRAFT_PAGE_SIZE)
+    const historyPage = paginate(this.allHistory || [], requestedHistoryPage, HISTORY_PAGE_SIZE)
+    this.setData({
+      drafts: draftPage.items,
+      draftCount: draftPage.count,
+      draftPage: draftPage.currentPage,
+      draftTotalPages: draftPage.totalPages,
+      hasDraftPagination: draftPage.hasPagination,
+      history: historyPage.items,
+      historyCount: historyPage.count,
+      historyPage: historyPage.currentPage,
+      historyTotalPages: historyPage.totalPages,
+      hasHistoryPagination: historyPage.hasPagination
+    })
+  },
+
+  previousDraftPage() {
+    if (this.data.draftPage <= 1) return
+    this.updatePageSlices(this.data.draftPage - 1, this.data.historyPage)
+    wx.pageScrollTo({ selector: '#draft-section', duration: 200 })
+  },
+
+  nextDraftPage() {
+    if (this.data.draftPage >= this.data.draftTotalPages) return
+    this.updatePageSlices(this.data.draftPage + 1, this.data.historyPage)
+    wx.pageScrollTo({ selector: '#draft-section', duration: 200 })
+  },
+
+  previousHistoryPage() {
+    if (this.data.historyPage <= 1) return
+    this.updatePageSlices(this.data.draftPage, this.data.historyPage - 1)
+    wx.pageScrollTo({ selector: '#completed-section', duration: 200 })
+  },
+
+  nextHistoryPage() {
+    if (this.data.historyPage >= this.data.historyTotalPages) return
+    this.updatePageSlices(this.data.draftPage, this.data.historyPage + 1)
+    wx.pageScrollTo({ selector: '#completed-section', duration: 200 })
+  },
 
   continueDraft(event) {
     const draft = this.data.drafts.find(item => item.id === event.currentTarget.dataset.id)
