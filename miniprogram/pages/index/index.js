@@ -1,13 +1,30 @@
 const { catalog } = require('../../data/index')
+const { DEFAULT_EXAM_TYPE, examTypes } = require('../../data/exam-types')
 const storage = require('../../utils/storage')
-const { buildYearOptions, filterPapersByYear, getRecordScore } = require('../../utils/paper-filter')
+const {
+  buildExamTypeOptions,
+  buildYearOptions,
+  filterPapers,
+  getPaperDisplayTitle,
+  getPaperExamType,
+  getRecordScore,
+  sortPapersByYearDesc
+} = require('../../utils/paper-filter')
 
 Page({
   data: {
     papers: [],
+    examTypes: [],
+    selectedExamType: DEFAULT_EXAM_TYPE,
+    selectedExamTypeIndex: 1,
+    selectedExamTypeLabel: '市考',
     years: [],
     selectedYear: 'all',
-    yearHint: '',
+    selectedYearIndex: 0,
+    selectedYearLabel: '全部年份',
+    filterHint: '',
+    emptyTitle: '',
+    emptyText: '',
     totalPaperCount: catalog.length,
     selectedPaper: null,
     showModules: false,
@@ -21,29 +38,61 @@ Page({
       const records = history.filter(item => item.paperId === paper.id)
       const scores = records.map(getRecordScore).filter(score => score !== null)
       const best = scores.length ? Math.max(...scores) : null
-      return { ...paper, attemptCount: records.length, bestScore: best }
+      return {
+        ...paper,
+        examType: getPaperExamType(paper),
+        displayTitle: getPaperDisplayTitle(paper),
+        attemptCount: records.length,
+        bestScore: best
+      }
     })
     const historyScores = history.map(getRecordScore).filter(score => score !== null)
     const best = historyScores.length ? Math.max(...historyScores) : null
     this.allPapers = papers
-    const visiblePapers = filterPapersByYear(papers, this.data.selectedYear)
+    this.examTypeOptions = buildExamTypeOptions(papers, examTypes)
     this.setData({
-      papers: visiblePapers,
-      years: buildYearOptions(papers),
-      yearHint: this.getYearHint(this.data.selectedYear, visiblePapers.length),
       attemptCount: history.length,
       bestScore: best == null ? '--' : `${best}`
     })
+    this.applyFilters(this.data.selectedExamType, this.data.selectedYear)
   },
 
-  getYearHint(selectedYear, count) {
-    return selectedYear === 'all' ? `全部年份 · ${count} 套` : `${selectedYear} 年 · ${count} 套`
+  applyFilters(selectedExamType, selectedYear) {
+    const typePapers = filterPapers(this.allPapers || [], { examType: selectedExamType })
+    const years = buildYearOptions(typePapers)
+    const effectiveYear = years.some(item => item.value === String(selectedYear))
+      ? String(selectedYear)
+      : 'all'
+    const papers = sortPapersByYearDesc(filterPapers(typePapers, { year: effectiveYear }))
+    const selectedOption = this.examTypeOptions.find(item => item.value === selectedExamType)
+      || this.examTypeOptions[0]
+    const selectedExamTypeIndex = Math.max(0, this.examTypeOptions.findIndex(item => item.value === selectedOption.value))
+    const selectedYearIndex = Math.max(0, years.findIndex(item => item.value === effectiveYear))
+    const yearLabel = effectiveYear === 'all' ? '全部年份' : `${effectiveYear} 年`
+    this.setData({
+      papers,
+      examTypes: this.examTypeOptions,
+      selectedExamType: selectedOption.value,
+      selectedExamTypeIndex,
+      selectedExamTypeLabel: selectedOption.label,
+      selectedYear: effectiveYear,
+      selectedYearIndex,
+      selectedYearLabel: yearLabel,
+      years,
+      filterHint: `${selectedOption.label} · ${yearLabel} · ${papers.length} 套`,
+      emptyTitle: selectedOption.emptyTitle || '没有符合条件的试卷',
+      emptyText: selectedOption.emptyText || '换一个考试类型或年份看看。'
+    })
+  },
+
+  selectExamType(event) {
+    const selected = this.examTypeOptions[Number(event.detail.value)]
+    if (selected) this.applyFilters(selected.value, 'all')
   },
 
   selectYear(event) {
-    const selectedYear = String(event.currentTarget.dataset.year)
-    const papers = filterPapersByYear(this.allPapers || [], selectedYear)
-    this.setData({ selectedYear, papers, yearHint: this.getYearHint(selectedYear, papers.length) })
+    const selected = this.data.years[Number(event.detail.value)]
+    if (selected) this.applyFilters(this.data.selectedExamType, selected.value)
   },
 
   startPaper(event) {

@@ -1,7 +1,7 @@
 <view class="page home-page">
   <view class="hero card">
     <view class="corn">🌽</view>
-    <view class="eyebrow">SHANGHAI EXAM LOOP</view>
+    <view class="eyebrow">YUMI EXAM LOOP</view>
     <view class="hero-title">把一套题刷透，<br/>比盲目追新题更重要。</view>
     <view class="hero-note">整卷检验节奏，模块拆解能力。蒙对的题，也会被单独捞出来复盘。</view>
     <view class="stats">
@@ -13,21 +13,32 @@
   </view>
 
   <view class="section-title paper-section-title">
-    <text>选择试卷</text><label>{{yearHint}}</label>
+    <text>选择试卷</text><label>{{papers.length}} 套</label>
   </view>
-  <scroll-view class="year-scroll" scroll-x="true" enable-flex="true" show-scrollbar="false">
-    <view class="year-filter">
-      <button class="year-chip {{selectedYear === item.value ? 'active' : ''}}" wx:for="{{years}}" wx:key="value" data-year="{{item.value}}" bindtap="selectYear">
-        <text>{{item.label}}</text><label>{{item.count}}</label>
-      </button>
-    </view>
-  </scroll-view>
-  <view class="paper-list">
+  <view class="filter-row">
+    <picker class="exam-picker" mode="selector" range="{{examTypes}}" range-key="label" value="{{selectedExamTypeIndex}}" bindchange="selectExamType">
+      <view class="filter-control">
+        <label>考试类型</label><text>{{selectedExamTypeLabel}}</text><small>⌄</small>
+      </view>
+    </picker>
+    <picker class="year-picker" mode="selector" range="{{years}}" range-key="label" value="{{selectedYearIndex}}" bindchange="selectYear">
+      <view class="filter-control">
+        <label>年份</label><text>{{selectedYearLabel}}</text><small>⌄</small>
+      </view>
+    </picker>
+  </view>
+  <view class="filter-caption">{{filterHint}}</view>
+  <view class="empty-state card" wx:if="{{!papers.length}}">
+    <view class="empty-icon">🗂️</view>
+    <view class="empty-title">{{emptyTitle}}</view>
+    <view class="empty-text">{{emptyText}}</view>
+  </view>
+  <view class="paper-list" wx:else>
     <view class="paper-card card" wx:for="{{papers}}" wx:key="id">
       <view class="paper-head">
         <view>
           <view class="paper-year">{{item.year}}</view>
-          <view class="paper-name">上海市考行测 {{item.category}} 类</view>
+          <view class="paper-name">{{item.displayTitle}}</view>
         </view>
         <view class="pill {{item.year >= 2025 ? 'validation' : ''}}">{{item.year >= 2025 ? '阶段验收' : '方法训练'}}</view>
       </view>
@@ -40,7 +51,7 @@
     </view>
   </view>
 
-  <view class="source-note">题库为考生回忆版，非上海官方发布。缺失或争议答案不计入训练分。</view>
+  <view class="source-note">题库为考生回忆版，非招录主管部门官方发布。缺失或争议答案不计入训练分。</view>
 
   <view class="mask" wx:if="{{showModules}}" bindtap="closeModules">
     <view class="sheet" catchtap="stopBubble">

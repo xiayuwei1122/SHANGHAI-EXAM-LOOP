@@ -10,6 +10,10 @@ let answers = 0
 catalog.forEach(summary => {
   const paper = require(`../miniprogram/packages/${summary.id}/paper`)
   assert(paper, `${summary.id}: paper missing`)
+  assert(summary.examType, `${summary.id}: catalog examType missing`)
+  assert(summary.displayTitle, `${summary.id}: catalog displayTitle missing`)
+  assert.strictEqual(paper.examType, summary.examType)
+  assert.strictEqual(paper.displayTitle, summary.displayTitle)
   assert.strictEqual(paper.questionCount, paper.questions.length)
   assert.strictEqual(paper.modules.reduce((sum, item) => sum + item.questionCount, 0), paper.questionCount)
   paper.questions.forEach(question => {

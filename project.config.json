@@ -1,7 +1,7 @@
 {
   "appid": "wxddc99052c760c339",
-  "projectname": "玉米的上海市考训练场",
-  "description": "上海市考行测整卷与模块回归训练",
+  "projectname": "玉米的考试训练场",
+  "description": "市考、事业单位等考试的整卷与模块回归训练",
   "compileType": "miniprogram",
   "miniprogramRoot": "miniprogram/",
   "setting": {
@@ -12,6 +12,6 @@
     "enhance": true,
     "compileHotReLoad": false
   },
-  "libVersion": "3.16.1",
+  "libVersion": "3.16.2",
   "simulatorPluginLibVersion": {}
 }

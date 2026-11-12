@@ -24,17 +24,40 @@ DATA_DIR = ROOT / "miniprogram" / "data"
 PACKAGES_DIR = ROOT / "miniprogram" / "packages"
 BASE = "https://kaoweilai.cn"
 
+def paper_spec(
+    paper_id: str,
+    exam_type: str,
+    year: int,
+    category: str,
+    title: str,
+    path: str,
+    min_questions: int,
+) -> dict:
+    return {
+        "id": paper_id,
+        "exam_type": exam_type,
+        "year": year,
+        "category": category,
+        "title": title,
+        "display_title": re.sub(r"^\d{4}\s*", "", title),
+        "path": path,
+        "min_questions": min_questions,
+    }
+
+
+# New exam families use a different exam_type. Add their display name in
+# miniprogram/data/exam-types.js; the home-page filter needs no further changes.
 PAPERS = [
-    ("sh-2019-a", 2019, "A", "2019 上海市考行测 A 类", "/zhenti-sh-2019-a.html"),
-    ("sh-2019-b", 2019, "B", "2019 上海市考行测 B 类", "/zhenti-sh-2019-b.html"),
-    ("sh-2020-a", 2020, "A", "2020 上海市考行测 A 类", "/zhenti-sh-2020-a.html"),
-    ("sh-2020-b", 2020, "B", "2020 上海市考行测 B 类", "/zhenti-sh-2020-b.html"),
-    ("sh-2021-a", 2021, "A", "2021 上海市考行测 A 类", "/zhenti-sh-2021-a.html"),
-    ("sh-2021-b", 2021, "B", "2021 上海市考行测 B 类", "/zhenti-sh-2021-b.html"),
-    ("sh-2022-b", 2022, "B", "2022 上海市考行测 B 类", "/zhenti-sh-2022-b.html"),
-    ("sh-2023-a", 2023, "A", "2023 上海市考行测 A 类", "/zhenti-sh-2023-a.html"),
-    ("sh-2025-a", 2025, "A", "2025 上海市考行测 A 类", "/zhenti-sh-2025-a.html"),
-    ("sh-2025-b", 2025, "B", "2025 上海市考行测 B 类", "/zhenti-sh-2025-b.html"),
+    paper_spec("sh-2019-a", "city-exam", 2019, "A", "2019 上海市考行测 A 类", "/zhenti-sh-2019-a.html", 115),
+    paper_spec("sh-2019-b", "city-exam", 2019, "B", "2019 上海市考行测 B 类", "/zhenti-sh-2019-b.html", 115),
+    paper_spec("sh-2020-a", "city-exam", 2020, "A", "2020 上海市考行测 A 类", "/zhenti-sh-2020-a.html", 115),
+    paper_spec("sh-2020-b", "city-exam", 2020, "B", "2020 上海市考行测 B 类", "/zhenti-sh-2020-b.html", 115),
+    paper_spec("sh-2021-a", "city-exam", 2021, "A", "2021 上海市考行测 A 类", "/zhenti-sh-2021-a.html", 115),
+    paper_spec("sh-2021-b", "city-exam", 2021, "B", "2021 上海市考行测 B 类", "/zhenti-sh-2021-b.html", 115),
+    paper_spec("sh-2022-b", "city-exam", 2022, "B", "2022 上海市考行测 B 类", "/zhenti-sh-2022-b.html", 115),
+    paper_spec("sh-2023-a", "city-exam", 2023, "A", "2023 上海市考行测 A 类", "/zhenti-sh-2023-a.html", 115),
+    paper_spec("sh-2025-a", "city-exam", 2025, "A", "2025 上海市考行测 A 类", "/zhenti-sh-2025-a.html", 115),
+    paper_spec("sh-2025-b", "city-exam", 2025, "B", "2025 上海市考行测 B 类", "/zhenti-sh-2025-b.html", 115),
 ]
 
 
@@ -120,7 +143,15 @@ def answer_and_explanation(qb: Tag) -> tuple[str, str, bool]:
     return answer, explanation or "暂无参考解析。", disputed
 
 
-def parse_paper(paper_id: str, year: int, category: str, title: str, path: str) -> dict:
+def parse_paper(
+    paper_id: str,
+    exam_type: str,
+    year: int,
+    category: str,
+    title: str,
+    display_title: str,
+    path: str,
+) -> dict:
     source_url = urljoin(BASE, path)
     soup = BeautifulSoup(curl_text(source_url), "html.parser")
     questions = []
@@ -206,12 +237,14 @@ def parse_paper(paper_id: str, year: int, category: str, title: str, path: str) 
     questions.sort(key=lambda item: item["number"])
     return {
         "id": paper_id,
+        "examType": exam_type,
         "year": year,
         "category": category,
         "title": title,
+        "displayTitle": display_title,
         "sourceUrl": source_url,
         "unofficial": True,
-        "notice": "考生回忆版，非上海官方发布；参考答案与解析仅供训练复盘。",
+        "notice": "考生回忆版，非招录主管部门官方发布；参考答案与解析仅供训练复盘。",
         "questionCount": len(questions),
         "answerCount": sum(bool(q["answer"]) for q in questions),
         "modules": modules,
@@ -226,23 +259,51 @@ def js_module(value: object) -> str:
     ) + ";\n"
 
 
+def update_subpackages() -> None:
+    app_config_path = ROOT / "miniprogram" / "app.json"
+    app_config = json.loads(app_config_path.read_text(encoding="utf-8"))
+    app_config["subpackages"] = [
+        {
+            "root": f"packages/{spec['id']}",
+            "pages": ["exam/exam", "result/result"],
+        }
+        for spec in PAPERS
+    ]
+    app_config_path.write_text(
+        json.dumps(app_config, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main() -> int:
     PACKAGES_DIR.mkdir(parents=True, exist_ok=True)
     catalog = []
     total_questions = 0
     total_answers = 0
 
-    for paper_id, year, category, title, path in PAPERS:
-        paper = parse_paper(paper_id, year, category, title, path)
-        if paper["questionCount"] < 115:
-            raise RuntimeError(f"{paper_id}: only {paper['questionCount']} questions parsed")
+    for spec in PAPERS:
+        paper_id = spec["id"]
+        paper = parse_paper(
+            paper_id=paper_id,
+            exam_type=spec["exam_type"],
+            year=spec["year"],
+            category=spec["category"],
+            title=spec["title"],
+            display_title=spec["display_title"],
+            path=spec["path"],
+        )
+        if paper["questionCount"] < spec["min_questions"]:
+            raise RuntimeError(
+                f"{paper_id}: only {paper['questionCount']} questions parsed; "
+                f"expected at least {spec['min_questions']}"
+            )
         package_dir = PACKAGES_DIR / paper_id
         package_dir.mkdir(parents=True, exist_ok=True)
         target = package_dir / "paper.js"
         target.write_text(js_module(paper), encoding="utf-8")
         catalog.append({key: paper[key] for key in (
-            "id", "year", "category", "title", "sourceUrl", "unofficial",
-            "notice", "questionCount", "answerCount", "modules"
+            "id", "examType", "year", "category", "title", "displayTitle",
+            "sourceUrl", "unofficial", "notice", "questionCount", "answerCount", "modules"
         )})
         for page_name, component_name in (("exam", "exam-runner"), ("result", "result-review")):
             page_dir = package_dir / page_name
@@ -283,7 +344,9 @@ def main() -> int:
         "module.exports = { catalog };\n"
     )
     (DATA_DIR / "index.js").write_text(index_source, encoding="utf-8")
-    if len(catalog) != 10 or total_questions < 1250 or total_answers < 1200:
+    update_subpackages()
+    expected_min_questions = sum(spec["min_questions"] for spec in PAPERS)
+    if len(catalog) != len(PAPERS) or total_questions < expected_min_questions or total_answers == 0:
         raise RuntimeError(f"unexpected totals: {len(catalog)} papers, {total_questions} questions, {total_answers} answers")
     print(f"OK: {len(catalog)} papers, {total_questions} questions, {total_answers} reference answers")
     return 0
