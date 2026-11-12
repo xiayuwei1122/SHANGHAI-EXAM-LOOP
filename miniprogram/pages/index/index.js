@@ -44,12 +44,16 @@ Page({
       const records = history.filter(item => item.paperId === paper.id)
       const scores = records.map(getRecordScore).filter(score => score !== null)
       const best = scores.length ? Math.max(...scores) : null
+      const draft = storage.getDraft(paper.id, 'paper', '')
+      const draftAnsweredCount = Object.values(draft?.answers || {}).filter(Boolean).length
       return {
         ...paper,
         examType: getPaperExamType(paper),
         displayTitle: getPaperDisplayTitle(paper),
         attemptCount: records.length,
-        bestScore: best
+        bestScore: best,
+        hasDraft: Boolean(draft),
+        draftAnsweredCount
       }
     })
     const historyScores = history.map(getRecordScore).filter(score => score !== null)
@@ -131,7 +135,16 @@ Page({
 
   chooseModule(event) {
     const paper = catalog.find(item => item.id === event.currentTarget.dataset.paper)
-    this.setData({ selectedPaper: paper, showModules: true })
+    const modules = paper.modules.map(module => {
+      const draft = storage.getDraft(paper.id, 'module', module.id)
+      const answeredCount = Object.values(draft?.answers || {}).filter(Boolean).length
+      return {
+        ...module,
+        hasDraft: Boolean(draft),
+        progressText: draft ? `继续 · 已答 ${answeredCount}/${module.questionCount}` : `${module.questionCount} 题`
+      }
+    })
+    this.setData({ selectedPaper: { ...paper, modules }, showModules: true })
   },
 
   closeModules() { this.setData({ showModules: false }) },

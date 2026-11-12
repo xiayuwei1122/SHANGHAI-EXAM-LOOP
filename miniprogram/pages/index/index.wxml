@@ -43,9 +43,10 @@
         <view class="pill {{item.year >= 2025 ? 'validation' : ''}}">{{item.year >= 2025 ? '阶段验收' : '方法训练'}}</view>
       </view>
       <view class="paper-meta">{{item.questionCount}} 题 · {{item.answerCount}} 题可评分 · 已刷 {{item.attemptCount}} 次</view>
+      <view class="paper-draft" wx:if="{{item.hasDraft}}">● 有未完成进度 · 已答 {{item.draftAnsweredCount}} / {{item.questionCount}}</view>
       <view class="paper-best" wx:if="{{item.bestScore !== null}}">历史最好：{{item.bestScore}} 分</view>
       <view class="paper-actions">
-        <button class="btn btn-primary" data-paper="{{item.id}}" bindtap="startPaper">刷整卷</button>
+        <button class="btn btn-primary" data-paper="{{item.id}}" bindtap="startPaper">{{item.hasDraft ? '继续整卷' : '刷整卷'}}</button>
         <button class="btn btn-ghost" data-paper="{{item.id}}" bindtap="chooseModule">选模块</button>
       </view>
     </view>
@@ -65,7 +66,7 @@
       <view class="sheet-title">{{selectedPaper.title}}</view>
       <view class="sheet-subtitle">选一个模块单独回归</view>
       <button class="module-row" wx:for="{{selectedPaper.modules}}" wx:key="id" data-module="{{item.id}}" bindtap="startModule">
-        <text>{{item.name}}</text><label>{{item.questionCount}} 题 ›</label>
+        <text>{{item.name}}</text><label class="{{item.hasDraft ? 'has-draft' : ''}}">{{item.progressText}} ›</label>
       </button>
       <button class="btn close-btn" bindtap="closeModules">取消</button>
     </view>

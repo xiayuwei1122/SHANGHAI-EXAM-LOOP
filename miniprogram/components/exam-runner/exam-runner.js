@@ -17,7 +17,16 @@ Component({
     answeredCount: 0, guessedCount: 0, timerText: '02:00:00', timerLabel: '剩余',
     showSheet: false, answerCells: []
   },
-  lifetimes: { detached() { this.stopTimer(); this.persistDraft() } },
+  lifetimes: {
+    detached() {
+      this.stopTimer()
+      if (!this.submitted) this.persistDraft()
+    }
+  },
+  pageLifetimes: {
+    show() { this.handleShow() },
+    hide() { this.handleHide() }
+  },
   methods: {
     init(paper, options) {
       this.paper = paper
@@ -41,8 +50,15 @@ Component({
       })
       this.renderQuestion()
       this.startTimer()
+      if (saved) wx.showToast({ title: '已续上上次进度', icon: 'none' })
     },
-    handleHide() { this.persistDraft() },
+    handleShow() {
+      if (this.paper && !this.submitted && !this.timer) this.startTimer()
+    },
+    handleHide() {
+      this.stopTimer()
+      if (!this.submitted) this.persistDraft()
+    },
     startTimer() {
       this.stopTimer()
       this.timer = setInterval(() => {
@@ -105,11 +121,17 @@ Component({
     stopBubble() {},
     jumpQuestion(event) { this.index = Number(event.currentTarget.dataset.index); this.setData({ showSheet: false }); this.renderQuestion() },
     persistDraft() {
-      if (!this.paper) return
+      if (!this.paper || this.submitted) return
       storage.saveDraft(this.paper.id, this.mode, this.moduleId, {
         answers: this.answers, guesses: this.guesses, elapsedSeconds: this.elapsedSeconds,
         index: this.index, updatedAt: Date.now()
       })
+    },
+    saveAndExit() {
+      this.stopTimer()
+      this.persistDraft()
+      wx.showToast({ title: '进度已保存', icon: 'success' })
+      wx.navigateBack({ delta: 1 })
     },
     confirmSubmit() {
       const blank = this.questionIds.length - Object.values(this.answers).filter(Boolean).length
@@ -121,6 +143,7 @@ Component({
     },
     submit(auto) {
       this.stopTimer()
+      this.submitted = true
       const result = scoreAttempt(this.paper, this.questionIds, this.answers, this.guesses)
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       const module = this.paper.modules.find(item => item.id === this.moduleId)

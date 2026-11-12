@@ -23,7 +23,11 @@
       <view class="check">{{guessed ? '✓' : ''}}</view><view><text>这题是蒙的</text><label>即使蒙对，交卷后也会进入复盘</label></view>
     </view>
   </view>
-  <view class="bottom-actions"><button class="btn" bindtap="previous" disabled="{{current === 1}}">上一题</button><button class="btn btn-primary" bindtap="next">{{current === total ? '交卷' : '下一题'}}</button></view>
+  <view class="bottom-actions">
+    <button class="btn save-exit" bindtap="saveAndExit">暂存退出</button>
+    <button class="btn" bindtap="previous" disabled="{{current === 1}}">上一题</button>
+    <button class="btn btn-primary" bindtap="next">{{current === total ? '交卷' : '下一题'}}</button>
+  </view>
   <view class="mask" wx:if="{{showSheet}}" bindtap="closeSheet">
     <view class="sheet" catchtap="stopBubble">
       <view class="sheet-head"><view><text>答题卡</text><label>{{answeredCount}} / {{total}} 已答</label></view><button bindtap="closeSheet">×</button></view>

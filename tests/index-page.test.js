@@ -1,8 +1,9 @@
 const assert = require('assert')
 
 let pageDefinition
+const memory = new Map()
 global.Page = definition => { pageDefinition = definition }
-global.wx = { getStorageSync: () => [], pageScrollTo() {} }
+global.wx = { getStorageSync: key => memory.get(key), pageScrollTo() {} }
 
 require('../miniprogram/pages/index/index')
 
@@ -59,5 +60,18 @@ assert.strictEqual(page.data.selectedExamType, 'all')
 assert.strictEqual(page.data.paperCount, 10)
 assert.strictEqual(page.data.papers.length, 4)
 assert.strictEqual(page.data.hasPagination, true)
+
+const draftPaperId = page.data.papers[0].id
+memory.set(`corn_exam_draft_v1:${draftPaperId}:paper:all`, {
+  answers: { q1: 'A', q2: 'B' },
+  guesses: {},
+  elapsedSeconds: 30,
+  index: 1
+})
+const pageWithDraft = createPage()
+pageWithDraft.onShow()
+const paperWithDraft = pageWithDraft.data.papers.find(item => item.id === draftPaperId)
+assert.strictEqual(paperWithDraft.hasDraft, true)
+assert.strictEqual(paperWithDraft.draftAnsweredCount, 2)
 
 console.log('index-page.test.js: OK')

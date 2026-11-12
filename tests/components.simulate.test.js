@@ -3,10 +3,11 @@ const simulate = require('miniprogram-simulate')
 
 const root = path.resolve(__dirname, '../miniprogram')
 const paper = require('../miniprogram/packages/sh-2019-a/paper')
+const componentIds = new Map()
 
 function createWxMock() {
   const memory = new Map()
-  const calls = { redirects: [], toasts: [] }
+  const calls = { redirects: [], toasts: [], backs: [] }
   global.wx = {
     getStorageSync(key) { return memory.get(key) },
     setStorageSync(key, value) { memory.set(key, value) },
@@ -15,13 +16,17 @@ function createWxMock() {
     showModal(options) { if (options.success) options.success({ confirm: true, cancel: false }) },
     redirectTo(options) { calls.redirects.push(options.url) },
     reLaunch(options) { calls.redirects.push(options.url) },
+    navigateBack(options) { calls.backs.push(options.delta) },
     showToast(options) { calls.toasts.push(options) }
   }
   return { memory, calls }
 }
 
 function mount(componentPath) {
-  const id = simulate.load(path.join(root, componentPath), { rootPath: root, compiler: 'simulate' })
+  if (!componentIds.has(componentPath)) {
+    componentIds.set(componentPath, simulate.load(path.join(root, componentPath), { rootPath: root, compiler: 'simulate' }))
+  }
+  const id = componentIds.get(componentPath)
   const component = simulate.render(id)
   const parent = document.createElement('parent-wrapper')
   component.attach(parent)
@@ -29,7 +34,7 @@ function mount(componentPath) {
 }
 
 test('module attempt marks a guess, scores it, and opens review', () => {
-  const { calls } = createWxMock()
+  const { memory, calls } = createWxMock()
   const exam = mount('components/exam-runner/exam-runner')
   exam.instance.init(paper, { mode: 'module', moduleId: 'm1' })
   exam.instance.stopTimer()
@@ -47,6 +52,7 @@ test('module attempt marks a guess, scores it, and opens review', () => {
   expect(calls.redirects).toHaveLength(1)
   const recordId = calls.redirects[0].match(/recordId=([^&]+)/)[1]
   exam.detach()
+  expect(memory.has('corn_exam_draft_v1:sh-2019-a:module:m1')).toBe(false)
 
   const review = mount('components/result-review/result-review')
   review.instance.init(paper, { recordId })
@@ -57,4 +63,33 @@ test('module attempt marks a guess, scores it, and opens review', () => {
   expect(review.data.reviewItems[0].status).toBe('guessed-correct')
   expect(review.data.reviewItems[0].question.explanation.length).toBeGreaterThan(5)
   review.detach()
+})
+
+test('draft resumes from the saved question and can exit without submitting', () => {
+  const { memory, calls } = createWxMock()
+  const moduleId = 'm1'
+  const questionIds = paper.modules.find(item => item.id === moduleId).questionIds
+  const draftKey = `corn_exam_draft_v1:${paper.id}:module:${moduleId}`
+  memory.set(draftKey, {
+    answers: { [questionIds[0]]: 'A' },
+    guesses: { [questionIds[0]]: true },
+    elapsedSeconds: 42,
+    index: 1,
+    updatedAt: Date.now()
+  })
+
+  const exam = mount('components/exam-runner/exam-runner')
+  exam.instance.init(paper, { mode: 'module', moduleId })
+  exam.instance.stopTimer()
+
+  expect(exam.data.current).toBe(2)
+  expect(exam.data.answeredCount).toBe(1)
+  expect(exam.data.guessedCount).toBe(1)
+  expect(calls.toasts.some(item => item.title === '已续上上次进度')).toBe(true)
+
+  exam.instance.saveAndExit()
+  expect(calls.backs).toEqual([1])
+  expect(memory.get(draftKey).elapsedSeconds).toBe(42)
+  expect(memory.has('corn_exam_history_v1')).toBe(false)
+  exam.detach()
 })
