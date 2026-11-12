@@ -12,8 +12,8 @@
     <button class="btn history-btn" bindtap="openHistory">查看练习记录</button>
   </view>
 
-  <view class="section-title paper-section-title">
-    <text>选择试卷</text><label>{{papers.length}} 套</label>
+  <view class="section-title paper-section-title" id="paper-section">
+    <text>选择试卷</text><label>{{paperCount}} 套</label>
   </view>
   <view class="filter-row">
     <picker class="exam-picker" mode="selector" range="{{examTypes}}" range-key="label" value="{{selectedExamTypeIndex}}" bindchange="selectExamType">
@@ -49,6 +49,12 @@
         <button class="btn btn-ghost" data-paper="{{item.id}}" bindtap="chooseModule">选模块</button>
       </view>
     </view>
+  </view>
+
+  <view class="pagination" wx:if="{{hasPagination}}">
+    <button class="page-button" disabled="{{currentPage <= 1}}" bindtap="previousPage">上一页</button>
+    <view class="page-status"><text>{{currentPage}}</text><label>/ {{totalPages}} 页</label></view>
+    <button class="page-button" disabled="{{currentPage >= totalPages}}" bindtap="nextPage">下一页</button>
   </view>
 
   <view class="source-note">题库为考生回忆版，非招录主管部门官方发布。缺失或争议答案不计入训练分。</view>

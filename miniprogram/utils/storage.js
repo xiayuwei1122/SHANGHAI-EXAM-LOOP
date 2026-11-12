@@ -35,11 +35,37 @@ function saveRecord(record) {
     guessed: record.result.guessed,
     guessedCorrect: record.result.guessedCorrect
   }
+  const nextHistory = [summary].concat(history.filter(item => item.id !== record.id))
   wx.setStorageSync(RECORD_PREFIX + record.id, record)
-  wx.setStorageSync(HISTORY_KEY, [summary].concat(history.filter(item => item.id !== record.id)).slice(0, 60))
+  wx.setStorageSync(HISTORY_KEY, nextHistory.slice(0, 60))
+  nextHistory.slice(60).forEach(item => wx.removeStorageSync(RECORD_PREFIX + item.id))
 }
 
 function getRecord(id) { return wx.getStorageSync(RECORD_PREFIX + id) || null }
 function getHistory() { return wx.getStorageSync(HISTORY_KEY) || [] }
 
-module.exports = { getDraft, saveDraft, clearDraft, saveRecord, getRecord, getHistory }
+function removeRecord(id) {
+  const history = getHistory().filter(item => item.id !== id)
+  wx.removeStorageSync(RECORD_PREFIX + id)
+  if (history.length) wx.setStorageSync(HISTORY_KEY, history)
+  else wx.removeStorageSync(HISTORY_KEY)
+  return history
+}
+
+function clearHistory() {
+  const history = getHistory()
+  history.forEach(item => wx.removeStorageSync(RECORD_PREFIX + item.id))
+  wx.removeStorageSync(HISTORY_KEY)
+  return history.length
+}
+
+module.exports = {
+  getDraft,
+  saveDraft,
+  clearDraft,
+  saveRecord,
+  getRecord,
+  getHistory,
+  removeRecord,
+  clearHistory
+}

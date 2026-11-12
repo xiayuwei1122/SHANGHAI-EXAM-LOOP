@@ -1,5 +1,8 @@
+.history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24rpx; }
 .history-title { margin-top: 10rpx; font-family: "Songti SC", serif; font-size: 50rpx; font-weight: 800; }
 .history-subtitle { margin-top: 7rpx; color: var(--muted); font-size: 24rpx; }
+.clear-all { flex: none; min-width: 128rpx; min-height: 58rpx; margin: 10rpx 0 0; padding: 0 18rpx; border: 1rpx solid #d9b8b1; border-radius: 999rpx; color: var(--red); background: #fff7f3; font-size: 22rpx; font-weight: 700; line-height: 58rpx; }
+.clear-all::after, .delete-record::after { border: 0; }
 .history-list { display: flex; flex-direction: column; gap: 16rpx; margin-top: 30rpx; }
 .history-card { display: flex; align-items: center; gap: 20rpx; padding: 24rpx; }
 .score { flex: none; width: 105rpx; color: var(--red); font-family: Georgia, serif; font-size: 46rpx; font-weight: 800; text-align: center; }
@@ -8,5 +11,5 @@
 .record-info text { display: block; font-size: 26rpx; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .record-info label, .record-info small { display: block; margin-top: 6rpx; color: var(--muted); font-size: 21rpx; }
 .record-info small { color: #987940; }
-.arrow { color: #a99a8b; font-size: 42rpx; }
+.delete-record { flex: none; min-width: 88rpx; min-height: 56rpx; margin: 0; padding: 0 14rpx; border: 1rpx solid var(--line); border-radius: 16rpx; color: var(--muted); background: transparent; font-size: 21rpx; line-height: 56rpx; }
 .empty { margin-top: 35rpx; padding: 60rpx 20rpx; color: var(--muted); text-align: center; }

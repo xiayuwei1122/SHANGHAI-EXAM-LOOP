@@ -11,9 +11,15 @@ const {
   sortPapersByYearDesc
 } = require('../../utils/paper-filter')
 
+const PAGE_SIZE = 4
+
 Page({
   data: {
     papers: [],
+    paperCount: 0,
+    currentPage: 1,
+    totalPages: 1,
+    hasPagination: false,
     examTypes: [],
     selectedExamType: DEFAULT_EXAM_TYPE,
     selectedExamTypeIndex: 1,
@@ -54,16 +60,23 @@ Page({
       attemptCount: history.length,
       bestScore: best == null ? '--' : `${best}`
     })
-    this.applyFilters(this.data.selectedExamType, this.data.selectedYear)
+    this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage)
   },
 
-  applyFilters(selectedExamType, selectedYear) {
+  applyFilters(selectedExamType, selectedYear, requestedPage = 1) {
     const typePapers = filterPapers(this.allPapers || [], { examType: selectedExamType })
     const years = buildYearOptions(typePapers)
     const effectiveYear = years.some(item => item.value === String(selectedYear))
       ? String(selectedYear)
       : 'all'
-    const papers = sortPapersByYearDesc(filterPapers(typePapers, { year: effectiveYear }))
+    const filteredPapers = sortPapersByYearDesc(filterPapers(typePapers, { year: effectiveYear }))
+    const hasPagination = effectiveYear === 'all' && filteredPapers.length > PAGE_SIZE
+    const totalPages = hasPagination ? Math.ceil(filteredPapers.length / PAGE_SIZE) : 1
+    const currentPage = Math.min(Math.max(Number(requestedPage) || 1, 1), totalPages)
+    const pageStart = (currentPage - 1) * PAGE_SIZE
+    const papers = hasPagination
+      ? filteredPapers.slice(pageStart, pageStart + PAGE_SIZE)
+      : filteredPapers
     const selectedOption = this.examTypeOptions.find(item => item.value === selectedExamType)
       || this.examTypeOptions[0]
     const selectedExamTypeIndex = Math.max(0, this.examTypeOptions.findIndex(item => item.value === selectedOption.value))
@@ -71,6 +84,10 @@ Page({
     const yearLabel = effectiveYear === 'all' ? '全部年份' : `${effectiveYear} 年`
     this.setData({
       papers,
+      paperCount: filteredPapers.length,
+      currentPage,
+      totalPages,
+      hasPagination,
       examTypes: this.examTypeOptions,
       selectedExamType: selectedOption.value,
       selectedExamTypeIndex,
@@ -79,7 +96,7 @@ Page({
       selectedYearIndex,
       selectedYearLabel: yearLabel,
       years,
-      filterHint: `${selectedOption.label} · ${yearLabel} · ${papers.length} 套`,
+      filterHint: `${selectedOption.label} · ${yearLabel} · ${filteredPapers.length} 套`,
       emptyTitle: selectedOption.emptyTitle || '没有符合条件的试卷',
       emptyText: selectedOption.emptyText || '换一个考试类型或年份看看。'
     })
@@ -87,12 +104,24 @@ Page({
 
   selectExamType(event) {
     const selected = this.examTypeOptions[Number(event.detail.value)]
-    if (selected) this.applyFilters(selected.value, 'all')
+    if (selected) this.applyFilters(selected.value, 'all', 1)
   },
 
   selectYear(event) {
     const selected = this.data.years[Number(event.detail.value)]
-    if (selected) this.applyFilters(this.data.selectedExamType, selected.value)
+    if (selected) this.applyFilters(this.data.selectedExamType, selected.value, 1)
+  },
+
+  previousPage() {
+    if (this.data.currentPage <= 1) return
+    this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage - 1)
+    wx.pageScrollTo({ selector: '#paper-section', duration: 200 })
+  },
+
+  nextPage() {
+    if (this.data.currentPage >= this.data.totalPages) return
+    this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage + 1)
+    wx.pageScrollTo({ selector: '#paper-section', duration: 200 })
   },
 
   startPaper(event) {
