@@ -3,9 +3,9 @@
 .history-subtitle { margin-top: 7rpx; color: var(--muted); font-size: 24rpx; }
 .record-section-title { display: flex; align-items: center; gap: 14rpx; margin: 34rpx 2rpx 16rpx; font-size: 28rpx; font-weight: 800; }
 .record-section-title label { color: var(--muted); font-size: 21rpx; font-weight: 500; }
-.completed-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20rpx; }
+.draft-heading, .completed-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20rpx; }
 .clear-all { flex: none; min-width: 128rpx; min-height: 58rpx; margin: 0 0 4rpx; padding: 0 18rpx; border: 1rpx solid #d9b8b1; border-radius: 999rpx; color: var(--red); background: #fff7f3; font-size: 22rpx; font-weight: 700; line-height: 58rpx; }
-.clear-all::after, .delete-record::after { border: 0; }
+.clear-all::after, .discard-draft::after, .delete-record::after { border: 0; }
 .draft-list, .history-list { display: flex; flex-direction: column; gap: 16rpx; }
 .draft-card { display: flex; align-items: center; gap: 18rpx; padding: 24rpx; border-color: #b8ccd8; background: #f8fcfe; }
 .draft-badge { flex: none; padding: 8rpx 12rpx; border-radius: 999rpx; color: var(--blue); background: #e4f0f5; font-size: 20rpx; font-weight: 800; }
@@ -13,7 +13,9 @@
 .draft-info text { display: block; overflow: hidden; font-size: 26rpx; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .draft-info label, .draft-info small { display: block; margin-top: 6rpx; color: var(--muted); font-size: 21rpx; }
 .draft-info small { color: #7c93a0; }
+.draft-side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 10rpx; }
 .draft-action { flex: none; color: var(--blue); font-size: 22rpx; font-weight: 800; }
+.discard-draft { min-width: 78rpx; min-height: 48rpx; margin: 0; padding: 0 12rpx; border: 1rpx solid #d9b8b1; border-radius: 14rpx; color: var(--red); background: #fff7f3; font-size: 20rpx; line-height: 48rpx; }
 .history-card { display: flex; align-items: center; gap: 20rpx; padding: 24rpx; }
 .score { flex: none; width: 105rpx; color: var(--red); font-family: Georgia, serif; font-size: 46rpx; font-weight: 800; text-align: center; }
 .score text { font-size: 19rpx; }

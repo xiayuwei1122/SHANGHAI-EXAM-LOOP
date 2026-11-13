@@ -7,12 +7,18 @@
   </view>
 
   <view wx:if="{{draftCount}}" id="draft-section">
-    <view class="record-section-title"><text>未完成练习</text><label>{{draftCount}} 个进度</label></view>
+    <view class="draft-heading">
+      <view class="record-section-title"><text>未完成练习</text><label>{{draftCount}} 个进度</label></view>
+      <button class="clear-all" bindtap="clearAllDrafts">清空进度</button>
+    </view>
     <view class="draft-list">
       <view class="draft-card card" wx:for="{{drafts}}" wx:key="id" data-id="{{item.id}}" bindtap="continueDraft">
         <view class="draft-badge">进行中</view>
         <view class="draft-info"><text>{{item.paperTitle}}</text><label>{{item.moduleName}} · 已答 {{item.answeredCount}}/{{item.total}}</label><small>{{item.dateText}}</small></view>
-        <view class="draft-action">{{item.actionText}} ›</view>
+        <view class="draft-side">
+          <view class="draft-action">{{item.actionText}} ›</view>
+          <button class="discard-draft" data-id="{{item.id}}" catchtap="discardDraft">放弃</button>
+        </view>
       </view>
     </view>
     <view class="pagination compact-pagination" wx:if="{{hasDraftPagination}}">

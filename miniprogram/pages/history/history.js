@@ -128,6 +128,41 @@ Page({
     wx.navigateTo({ url: `/packages/${draft.paperId}/exam/exam?mode=${draft.mode}${moduleQuery}` })
   },
 
+  discardDraft(event) {
+    const draft = (this.allDrafts || []).find(item => item.id === event.currentTarget.dataset.id)
+    if (!draft) return
+    wx.showModal({
+      title: '放弃这次练习？',
+      content: `${draft.paperTitle} · ${draft.moduleName}的未完成进度将被删除，已完成成绩不受影响。`,
+      confirmText: '放弃练习',
+      confirmColor: '#a64132',
+      success: result => {
+        if (!result.confirm) return
+        storage.clearDraft(draft.paperId, draft.mode, draft.moduleId)
+        this.loadPageData()
+        wx.showToast({ title: '进度已清除', icon: 'success' })
+      }
+    })
+  },
+
+  clearAllDrafts() {
+    wx.showModal({
+      title: '清空全部未完成进度？',
+      content: `将清除 ${this.data.draftCount} 个未完成进度，已完成成绩不受影响。`,
+      confirmText: '全部清除',
+      confirmColor: '#a64132',
+      success: result => {
+        if (!result.confirm) return
+        const drafts = this.allDrafts || []
+        drafts.forEach(draft => {
+          storage.clearDraft(draft.paperId, draft.mode, draft.moduleId)
+        })
+        this.loadPageData()
+        wx.showToast({ title: '进度已全部清除', icon: 'success' })
+      }
+    })
+  },
+
   openRecord(event) {
     const record = this.data.history.find(item => item.id === event.currentTarget.dataset.id)
     if (record) wx.navigateTo({ url: `/packages/${record.paperId}/result/result?recordId=${record.id}` })
