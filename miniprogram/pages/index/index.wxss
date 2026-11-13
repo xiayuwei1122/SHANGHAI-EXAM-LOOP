@@ -27,7 +27,6 @@
 .paper-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; }
 .paper-year { color: var(--red); font-family: Georgia, serif; font-size: 43rpx; font-weight: 800; }
 .paper-name { margin-top: 4rpx; font-size: 29rpx; font-weight: 700; }
-.pill.validation { color: var(--red-dark); background: #f3dfdc; }
 .paper-meta { margin-top: 17rpx; color: var(--muted); font-size: 24rpx; }
 .paper-draft { margin-top: 10rpx; color: var(--blue); font-size: 23rpx; font-weight: 700; }
 .paper-best { margin-top: 9rpx; color: var(--green); font-size: 24rpx; font-weight: 700; }

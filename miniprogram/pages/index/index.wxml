@@ -40,7 +40,6 @@
           <view class="paper-year">{{item.year}}</view>
           <view class="paper-name">{{item.displayTitle}}</view>
         </view>
-        <view class="pill {{item.year >= 2025 ? 'validation' : ''}}">{{item.year >= 2025 ? '阶段验收' : '方法训练'}}</view>
       </view>
       <view class="paper-meta">{{item.questionCount}} 题 · {{item.answerCount}} 题可评分 · 已刷 {{item.attemptCount}} 次</view>
       <view class="paper-draft" wx:if="{{item.hasDraft}}">● 未完成进度已保留 · 去练习记录可续答</view>
