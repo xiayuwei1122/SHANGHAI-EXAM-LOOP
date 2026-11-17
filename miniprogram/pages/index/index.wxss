@@ -8,7 +8,9 @@
 .stat { flex: 1; padding: 20rpx 12rpx; text-align: center; border-radius: 20rpx; background: rgba(255,255,255,.08); }
 .stat text { display: block; font-size: 39rpx; color: #f0c76e; font-weight: 800; }
 .stat label { display: block; margin-top: 5rpx; color: #cfc4ba; font-size: 21rpx; }
-.history-btn { margin-top: 22rpx; color: #fff; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 13rpx; margin-top: 22rpx; }
+.hero-link { margin: 0; color: #fff; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.method-link { color: #f4d889; }
 .paper-section-title { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; }
 .paper-section-title label { color: var(--muted); font-size: 22rpx; font-weight: 600; }
 .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14rpx; }

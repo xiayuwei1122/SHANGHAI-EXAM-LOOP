@@ -1,6 +1,7 @@
 const { catalog } = require('../../data/index')
 const { DEFAULT_EXAM_TYPE, examTypes } = require('../../data/exam-types')
 const storage = require('../../utils/storage')
+const methodStorage = require('../../utils/method-storage')
 const {
   buildExamTypeOptions,
   buildYearOptions,
@@ -35,7 +36,8 @@ Page({
     selectedPaper: null,
     showModules: false,
     attemptCount: 0,
-    bestScore: '--'
+    bestScore: '--',
+    methodCount: 0
   },
 
   onShow() {
@@ -62,7 +64,8 @@ Page({
     this.examTypeOptions = buildExamTypeOptions(papers, examTypes)
     this.setData({
       attemptCount: history.length,
-      bestScore: best == null ? '--' : `${best}`
+      bestScore: best == null ? '--' : `${best}`,
+      methodCount: methodStorage.getMethods().length
     })
     this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage)
   },
@@ -197,6 +200,8 @@ Page({
   },
 
   openHistory() { wx.navigateTo({ url: '/pages/history/history' }) },
+
+  openMethods() { wx.navigateTo({ url: '/pages/methods/methods' }) },
 
   stopBubble() {}
 })

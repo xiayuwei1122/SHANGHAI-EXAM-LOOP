@@ -9,7 +9,10 @@
       <view class="stat"><text>{{bestScore}}</text><label>历史最好</label></view>
       <view class="stat"><text>{{totalPaperCount}}</text><label>回忆版试卷</label></view>
     </view>
-    <button class="btn history-btn" bindtap="openHistory">查看练习记录</button>
+    <view class="hero-actions">
+      <button class="btn hero-link" bindtap="openHistory">练习记录</button>
+      <button class="btn hero-link method-link" bindtap="openMethods">方法本 · {{methodCount}}</button>
+    </view>
   </view>
 
   <view class="section-title paper-section-title" id="paper-section">

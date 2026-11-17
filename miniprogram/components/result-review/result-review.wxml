@@ -29,6 +29,7 @@
         <view class="answer-line"><text>你的答案：<b>{{item.userAnswer || '未答'}}</b></text><text>参考答案：<b>{{item.answer || '争议/缺失'}}</b></text></view>
         <view class="option {{option.userSelected ? 'user' : ''}} {{option.right ? 'right' : ''}}" wx:for="{{item.question.options}}" wx:for-item="option" wx:key="key"><text>{{option.key}}</text><label>{{option.text}}</label></view>
         <view class="analysis"><view>解析</view><text selectable="true">{{item.question.explanation}}</text></view>
+        <button class="method-capture" data-id="{{item.questionId}}" bindtap="saveAsMethod">＋ 沉淀为方法卡</button>
       </view>
     </view>
   </view>

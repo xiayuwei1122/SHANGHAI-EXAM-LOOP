@@ -1,4 +1,5 @@
 const storage = require('../../utils/storage')
+const methodStorage = require('../../utils/method-storage')
 
 function formatDuration(seconds) {
   const minute = Math.floor(seconds / 60)
@@ -59,6 +60,37 @@ Component({
     toggleItem(event) {
       const id = event.currentTarget.dataset.id
       this.setData({ [`expanded.${id}`]: !this.data.expanded[id] })
+    },
+    saveAsMethod(event) {
+      const item = this.data.reviewItems.find(detail => detail.questionId === event.currentTarget.dataset.id)
+      if (!item) return
+      const question = item.question
+      methodStorage.savePrefill({
+        title: `${question.type || '这类题'}的解题方法`,
+        category: question.moduleName || '未分类',
+        recognition: '',
+        steps: '',
+        pitfalls: '',
+        notes: '',
+        tags: ['典型题', item.statusText],
+        images: [],
+        examples: [{
+          id: `${this.paper.id}:${question.id}`,
+          sourceType: 'paper',
+          paperId: this.paper.id,
+          paperTitle: this.paper.title,
+          questionId: question.id,
+          number: question.number,
+          moduleName: question.moduleName,
+          type: question.type,
+          stem: question.stem,
+          answer: item.answer,
+          userAnswer: item.userAnswer,
+          explanation: question.explanation,
+          images: []
+        }]
+      })
+      wx.navigateTo({ url: '/pages/method-editor/method-editor?from=review' })
     },
     retry() { wx.redirectTo({ url: `/packages/${this.paper.id}/exam/exam?mode=${this.record.mode}&moduleId=${this.record.moduleId || ''}` }) },
     backHome() { wx.reLaunch({ url: '/pages/index/index' }) }

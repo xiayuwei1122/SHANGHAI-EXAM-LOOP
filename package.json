@@ -2,7 +2,7 @@
   "name": "shanghai-exam-loop-miniapp",
   "private": true,
   "scripts": {
-    "test": "node tests/score.test.js && node tests/data.test.js && node tests/storage.test.js && node tests/paper-filter.test.js && node tests/index-page.test.js && node tests/history-page.test.js && jest --runInBand",
+    "test": "node tests/score.test.js && node tests/data.test.js && node tests/storage.test.js && node tests/method-storage.test.js && node tests/method-editor.test.js && node tests/paper-filter.test.js && node tests/index-page.test.js && node tests/history-page.test.js && jest --runInBand",
     "import:papers": "python3 scripts/import_papers.py",
     "check": "npm test && find miniprogram -name '*.js' -print0 | xargs -0 -n1 node --check"
   },

@@ -1,0 +1,40 @@
+<view class="page methods-page">
+  <view class="methods-hero card">
+    <view class="methods-eyebrow">我的方法本</view>
+    <view class="methods-title">把典型题，整理成能复用的方法。</view>
+    <view class="methods-note">记录识别信号、解题步骤和易错点，下次看到同类题时能马上想起来。</view>
+    <view class="methods-actions">
+      <button class="btn btn-primary" bindtap="createMethod">＋ 新建方法卡</button>
+      <button class="btn photo-button" bindtap="createFromImage">▣ 拍照记题</button>
+    </view>
+  </view>
+
+  <view class="method-toolbar">
+    <input class="search-input" value="{{keyword}}" bindinput="search" placeholder="搜索方法、分类或标签" />
+    <view class="method-count">{{methodCount}} 张方法卡</view>
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x="true" enable-flex="true" wx:if="{{categories.length}}">
+    <view class="category-list">
+      <view class="category-chip {{selectedCategory === item.name ? 'active' : ''}}" wx:for="{{categories}}" wx:key="name" data-name="{{item.name}}" bindtap="selectCategory">{{item.name}} · {{item.count}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="method-empty card" wx:if="{{!methods.length}}">
+    <view class="empty-icon">🗂️</view>
+    <view class="empty-title">{{methodCount ? '没有匹配的方法卡' : '还没有沉淀方法'}}</view>
+    <view class="empty-note">{{methodCount ? '换个分类或关键词看看。' : '可以手动创建，也可以在逐题复盘里把典型题沉淀进来。'}}</view>
+  </view>
+
+  <view class="method-list" wx:else>
+    <view class="method-card card" wx:for="{{methods}}" wx:key="id" data-id="{{item.id}}" bindtap="editMethod">
+      <view class="method-head"><view class="category-label">{{item.category}}</view><view class="method-date">{{item.dateText}}</view></view>
+      <view class="method-name">{{item.title}}</view>
+      <view class="method-summary">{{item.summary}}</view>
+      <view class="method-tags" wx:if="{{item.tags.length}}"><text wx:for="{{item.tags}}" wx:key="*this">#{{item}}</text></view>
+      <view class="method-meta"><text>典型题 {{item.exampleCount}}</text><text>图片 {{item.imageCount}}</text><label>查看编辑 ›</label></view>
+    </view>
+  </view>
+
+  <view class="local-note">当前方法卡保存在本机，不会上传。清理微信数据或更换设备前请注意备份。</view>
+</view>

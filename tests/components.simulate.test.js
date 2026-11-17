@@ -7,7 +7,7 @@ const componentIds = new Map()
 
 function createWxMock() {
   const memory = new Map()
-  const calls = { redirects: [], toasts: [], backs: [] }
+  const calls = { redirects: [], navigations: [], toasts: [], backs: [] }
   global.wx = {
     getStorageSync(key) { return memory.get(key) },
     setStorageSync(key, value) { memory.set(key, value) },
@@ -15,6 +15,7 @@ function createWxMock() {
     pageScrollTo() {},
     showModal(options) { if (options.success) options.success({ confirm: true, cancel: false }) },
     redirectTo(options) { calls.redirects.push(options.url) },
+    navigateTo(options) { calls.navigations.push(options.url) },
     reLaunch(options) { calls.redirects.push(options.url) },
     navigateBack(options) { calls.backs.push(options.delta) },
     showToast(options) { calls.toasts.push(options) }
@@ -62,6 +63,12 @@ test('module attempt marks a guess, scores it, and opens review', () => {
   expect(review.data.reviewItems).toHaveLength(1)
   expect(review.data.reviewItems[0].status).toBe('guessed-correct')
   expect(review.data.reviewItems[0].question.explanation.length).toBeGreaterThan(5)
+  review.instance.saveAsMethod({ currentTarget: { dataset: { id: review.data.reviewItems[0].questionId } } })
+  expect(calls.navigations).toEqual(['/pages/method-editor/method-editor?from=review'])
+  const prefill = memory.get('corn_exam_method_prefill_v1')
+  expect(prefill.examples).toHaveLength(1)
+  expect(prefill.examples[0].sourceType).toBe('paper')
+  expect(prefill.examples[0].paperId).toBe(paper.id)
   review.detach()
 })
 
