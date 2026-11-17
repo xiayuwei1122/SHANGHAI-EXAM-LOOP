@@ -34,8 +34,8 @@
       <view class="method-name">{{item.title}}</view>
       <view class="method-summary">{{item.summary}}</view>
       <view class="method-tags" wx:if="{{item.tags && item.tags.length}}"><text wx:for="{{item.tags}}" wx:key="*this">#{{item}}</text></view>
-      <view class="method-meta" wx:if="{{item.kind === 'free'}}"><text>笔画 {{item.strokeCount}}</text><text>图片 {{item.imageCount}}</text><label>继续创作 ›</label></view>
-      <view class="method-meta" wx:else><text>典型题 {{item.exampleCount}}</text><text>图片 {{item.imageCount}}</text><label>查看编辑 ›</label></view>
+      <view class="method-meta" wx:if="{{item.kind === 'free'}}"><text>笔画 {{item.strokeCount}}</text><text>图片 {{item.imageCount}}</text><button class="delete-entry" data-id="{{item.id}}" data-kind="{{item.kind}}" catchtap="deleteItem">删除</button><label>继续创作 ›</label></view>
+      <view class="method-meta" wx:else><text>典型题 {{item.exampleCount}}</text><text>图片 {{item.imageCount}}</text><button class="delete-entry" data-id="{{item.id}}" data-kind="{{item.kind}}" catchtap="deleteItem">删除</button><label>查看编辑 ›</label></view>
     </view>
   </view>
 

@@ -127,5 +127,34 @@ Page({
       ? `/pages/free-note/free-note?id=${id}`
       : `/pages/method-editor/method-editor?id=${id}`
     wx.navigateTo({ url })
+  },
+
+  deleteItem(event) {
+    const { id, kind } = event.currentTarget.dataset
+    const isFreeNote = kind === 'free'
+    wx.showModal({
+      title: isFreeNote ? '删除这张自由笔记？' : '删除这张方法卡？',
+      content: '删除后无法恢复，其中保存的本地图片也会一并清理。',
+      cancelText: '保留',
+      confirmText: '删除',
+      confirmColor: '#e05575',
+      success: result => {
+        if (!result.confirm) return
+        const removed = isFreeNote
+          ? notebookStorage.removeNote(id)
+          : methodStorage.removeMethod(id)
+        if (!removed) return
+        const imagePaths = isFreeNote
+          ? notebookStorage.getImagePaths(removed)
+          : (removed.images || []).concat(
+            (removed.examples || []).reduce((paths, example) => paths.concat(example.images || []), [])
+          )
+        if (typeof wx.removeSavedFile === 'function') {
+          imagePaths.filter(Boolean).forEach(filePath => wx.removeSavedFile({ filePath, fail() {} }))
+        }
+        wx.showToast({ title: '已删除', icon: 'success' })
+        this.onShow()
+      }
+    })
   }
 })

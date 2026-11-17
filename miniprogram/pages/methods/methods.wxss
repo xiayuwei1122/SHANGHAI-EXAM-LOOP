@@ -33,7 +33,9 @@
 .method-tags { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 15rpx; }
 .method-tags text { color: #625ce0; font-size: 21rpx; }
 .method-meta { display: flex; align-items: center; gap: 18rpx; margin-top: 20rpx; padding-top: 17rpx; border-top: 1rpx solid #ececf3; color: #868697; font-size: 21rpx; }
-.method-meta label { margin-left: auto; color: #625ce0; font-weight: 700; }
+.delete-entry { min-height: 44rpx; margin: 0 0 0 auto; padding: 0 15rpx; border-radius: 999rpx; color: #d94f72; background: #fff1f5; font-size: 20rpx; line-height: 44rpx; }
+.delete-entry::after { border: 0; }
+.method-meta label { color: #625ce0; font-weight: 700; }
 .method-empty { margin-top: 26rpx; padding: 54rpx 28rpx; text-align: center; }
 .empty-icon { display: grid; place-items: center; width: 84rpx; height: 84rpx; margin: 0 auto; border-radius: 28rpx; color: white; background: linear-gradient(135deg, #7770ee, #f185b7); font-size: 50rpx; transform: rotate(-4deg); }
 .empty-title { margin-top: 20rpx; color: #292940; font-size: 29rpx; font-weight: 800; }
