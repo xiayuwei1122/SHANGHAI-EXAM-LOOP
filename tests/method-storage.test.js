@@ -12,12 +12,14 @@ const methodStorage = require('../miniprogram/utils/method-storage')
 const created = methodStorage.saveMethod({
   title: ' 两期比重判断 ',
   category: '资料分析',
+  content: ' 看到部分量和总体量后，先比较增长率 ',
   recognition: '看到部分量和总体量',
   tags: '公式，易错,公式',
   examples: [{ id: 'paper:q1', sourceType: 'paper' }]
 })
 
 assert.strictEqual(created.title, '两期比重判断')
+assert.strictEqual(created.content, '看到部分量和总体量后，先比较增长率')
 assert.deepStrictEqual(created.tags, ['公式', '易错'])
 assert.strictEqual(methodStorage.getMethods().length, 1)
 assert.strictEqual(methodStorage.getMethod(created.id).examples.length, 1)

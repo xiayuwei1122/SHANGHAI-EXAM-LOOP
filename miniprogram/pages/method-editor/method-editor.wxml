@@ -1,7 +1,7 @@
 <view class="page editor-page">
   <view class="editor-intro card">
-    <view class="intro-title">一张方法卡，只讲清一个解题模型。</view>
-    <view class="intro-note">重点写清“看到什么特征”和“接下来怎么做”，比摘抄一大段解析更有用。</view>
+    <view class="intro-title">一张方法卡，记住一个解题方法。</view>
+    <view class="intro-note">不用照固定格式，口诀、步骤、易错点或自己的理解，怎么顺手怎么记。</view>
   </view>
 
   <view class="form-card card">
@@ -11,11 +11,9 @@
     <view class="field"><label>标签</label><input value="{{form.tagsText}}" data-field="tagsText" bindinput="inputField" placeholder="用逗号分隔，如：公式，易错，秒杀" maxlength="100" /></view>
   </view>
 
-  <view class="form-card card">
-    <view class="textarea-field"><label>识别信号</label><small>看到哪些题目特征时，应该想到这个方法？</small><textarea value="{{form.recognition}}" data-field="recognition" bindinput="inputField" placeholder="例如：同时出现现期、基期、部分量和总体量……" maxlength="800" auto-height="true" /></view>
-    <view class="textarea-field"><label>解题步骤</label><small>尽量写成可以照着执行的步骤。</small><textarea value="{{form.steps}}" data-field="steps" bindinput="inputField" placeholder="按 1、2、3 写出可以照着执行的步骤" maxlength="1500" auto-height="true" /></view>
-    <view class="textarea-field"><label>易错点</label><textarea value="{{form.pitfalls}}" data-field="pitfalls" bindinput="inputField" placeholder="最容易掉进哪个坑？" maxlength="800" auto-height="true" /></view>
-    <view class="textarea-field"><label>我的补充</label><textarea value="{{form.notes}}" data-field="notes" bindinput="inputField" placeholder="口诀、变形、自己的理解……" maxlength="1500" auto-height="true" /></view>
+  <view class="form-card card method-content-card">
+    <view class="textarea-field method-content"><label>方法内容</label><small>不限格式，按自己的思路自由记录。</small><textarea value="{{form.content}}" data-field="content" bindinput="inputField" placeholder="可以写题目特征、解题步骤、口诀、易错点……\n\n也可以完全按你自己的习惯来。" maxlength="5000" />
+    </view>
   </view>
 
   <view class="section-heading example-section-heading">
@@ -25,10 +23,7 @@
 
   <view class="external-editor card" wx:if="{{showExternalEditor}}">
     <view class="external-title">录入外部典型题</view>
-    <view class="field"><label>来源或标题</label><input value="{{externalForm.source}}" data-field="source" bindinput="inputExternal" placeholder="例如：某套模拟卷 / 自己整理" maxlength="60" /></view>
-    <view class="textarea-field"><label>题干</label><textarea value="{{externalForm.stem}}" data-field="stem" bindinput="inputExternal" placeholder="可以粘贴题目文字；只有图片也可以保存" maxlength="2000" auto-height="true" /></view>
-    <view class="field"><label>参考答案</label><input value="{{externalForm.answer}}" data-field="answer" bindinput="inputExternal" placeholder="例如：B" maxlength="100" /></view>
-    <view class="textarea-field"><label>解析或补充</label><textarea value="{{externalForm.analysis}}" data-field="analysis" bindinput="inputExternal" placeholder="这道题为什么典型？" maxlength="1200" auto-height="true" /></view>
+    <view class="textarea-field external-content"><label>题目内容</label><small>题干、选项、答案、解析和来源，想写什么就写什么。</small><textarea value="{{externalForm.content}}" data-field="content" bindinput="inputExternal" placeholder="把题目直接粘贴在这里……\n\n例：\n题目……\n答案：B\n我的理解……" maxlength="5000" /></view>
     <view class="external-images">
       <view class="image-item" wx:for="{{externalForm.images}}" wx:key="*this">
         <image src="{{item}}" mode="aspectFill" />
@@ -36,19 +31,19 @@
       </view>
       <view class="image-add" wx:if="{{externalForm.images.length < 3}}" bindtap="chooseExternalImages"><text>＋</text><label>题目图片</label></view>
     </view>
-    <view class="external-note">图片保存在本机。当前可手动补充题干，后续接入 OCR 后再自动识别。</view>
+    <view class="external-note">文字只需填上面一个大框；也可只添加题目图片。图片保存在本机。</view>
     <view class="external-actions"><button class="btn" bindtap="cancelExternal">取消</button><button class="btn btn-primary" bindtap="addExternalExample">加入典型题</button></view>
   </view>
 
   <view class="example-card card" wx:for="{{form.examples}}" wx:key="id">
     <view class="example-head"><text>{{item.paperTitle}}{{item.number ? ' · 第 ' + item.number + ' 题' : ''}}</text><button data-index="{{index}}" bindtap="removeExample">移除</button></view>
-    <view class="example-type">{{item.moduleName}} · {{item.type}}</view>
+    <view class="example-type">{{item.moduleName}}{{item.type ? ' · ' + item.type : ''}}</view>
     <view class="example-image-list" wx:if="{{item.images.length}}">
       <image wx:for="{{item.images}}" wx:for-item="image" wx:for-index="imageIndex" wx:key="*this" src="{{image}}" mode="aspectFill" data-example="{{index}}" data-image="{{imageIndex}}" bindtap="previewExampleImage" />
     </view>
-    <view class="example-stem" wx:if="{{item.stem}}">{{item.stem}}</view>
-    <view class="example-answer">参考答案：{{item.answer || '未填写'}}<text wx:if="{{item.sourceType !== 'external'}}"> · 你的答案：{{item.userAnswer || '未答'}}</text></view>
-    <view class="example-analysis" wx:if="{{item.sourceType === 'external' && item.explanation}}">{{item.explanation}}</view>
+    <view class="example-stem" wx:if="{{item.sourceType === 'external' && item.content}}">{{item.content}}</view>
+    <view class="example-stem" wx:elif="{{item.stem}}">{{item.stem}}</view>
+    <view class="example-answer" wx:if="{{item.sourceType !== 'external'}}">参考答案：{{item.answer || '未填写'}} · 你的答案：{{item.userAnswer || '未答'}}</view>
   </view>
 
   <view class="section-heading"><text>图片附件</text><label>{{form.images.length}} / 3</label></view>

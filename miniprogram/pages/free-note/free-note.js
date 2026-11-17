@@ -37,7 +37,9 @@ Page({
     canUndo: false,
     canRedo: false,
     elementCount: 0,
-    isEditing: false
+    isEditing: false,
+    showQuestionImporter: false,
+    questionDraft: { content: '', images: [] }
   },
 
   onLoad(options) {
@@ -63,7 +65,10 @@ Page({
 
   onHide() { this.autoSave() },
 
-  onUnload() { this.autoSave() },
+  onUnload() {
+    this.autoSave()
+    this.cleanupQuestionDraft()
+  },
 
   initCanvas() {
     wx.createSelectorQuery().select('#freeCanvas').fields({ node: true, size: true }).exec(result => {
@@ -251,6 +256,134 @@ Page({
     })
   },
 
+  startQuestionImport() {
+    if (this.data.showQuestionImporter) return
+    this.setData({ showQuestionImporter: true, questionDraft: { content: '', images: [] } })
+  },
+
+  inputQuestionDraft(event) {
+    this.setData({
+      questionDraft: { ...this.data.questionDraft, content: event.detail.value }
+    })
+  },
+
+  chooseQuestionImages() {
+    const remaining = Math.max(0, 3 - this.data.questionDraft.images.length)
+    if (!remaining) {
+      wx.showToast({ title: '一道题最多添加 3 张图片', icon: 'none' })
+      return
+    }
+    wx.chooseMedia({
+      count: remaining,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: async result => {
+        const saved = []
+        for (const file of result.tempFiles || []) {
+          const path = await this.persistImage(file.tempFilePath)
+          if (path) saved.push(path)
+        }
+        if (!saved.length) return
+        this.setData({
+          questionDraft: {
+            ...this.data.questionDraft,
+            images: this.data.questionDraft.images.concat(saved)
+          }
+        })
+      },
+      fail: error => {
+        if (!String(error.errMsg || '').includes('cancel')) wx.showToast({ title: '图片选择失败', icon: 'none' })
+      }
+    })
+  },
+
+  persistImage(tempFilePath) {
+    return new Promise(resolve => {
+      wx.saveFile({
+        tempFilePath,
+        success: saved => resolve(saved.savedFilePath),
+        fail: () => {
+          wx.showToast({ title: '图片保存失败', icon: 'none' })
+          resolve('')
+        }
+      })
+    })
+  },
+
+  previewQuestionImage(event) {
+    const images = this.data.questionDraft.images
+    const current = images[Number(event.currentTarget.dataset.index)]
+    if (current) wx.previewImage({ current, urls: images })
+  },
+
+  removeQuestionImage(event) {
+    const index = Number(event.currentTarget.dataset.index)
+    const path = this.data.questionDraft.images[index]
+    const images = this.data.questionDraft.images.filter((item, imageIndex) => imageIndex !== index)
+    this.setData({ questionDraft: { ...this.data.questionDraft, images } })
+    if (path) wx.removeSavedFile({ filePath: path, fail() {} })
+  },
+
+  cleanupQuestionDraft() {
+    ;(this.data.questionDraft?.images || []).forEach(filePath => {
+      wx.removeSavedFile({ filePath, fail() {} })
+    })
+  },
+
+  cancelQuestionImport() {
+    this.cleanupQuestionDraft()
+    this.setData({ showQuestionImporter: false, questionDraft: { content: '', images: [] } })
+  },
+
+  addExternalQuestion() {
+    const content = String(this.data.questionDraft.content || '').trim()
+    const images = this.data.questionDraft.images.slice()
+    if (!content && !images.length) {
+      wx.showToast({ title: '请填写题目内容或添加图片', icon: 'none' })
+      return
+    }
+    this.checkpoint()
+    const movableCount = this.elements.filter(item => item.type === 'text' || item.type === 'image').length
+    const baseY = round(clamp(0.07 + (movableCount % 5) * 0.06, 0.07, 0.38))
+    if (content) {
+      this.elements.push({
+        id: elementId('question'),
+        type: 'text',
+        kind: 'question',
+        text: content,
+        x: 0.06,
+        y: baseY,
+        width: 0.88,
+        height: 0.2,
+        fontSize: 0.033,
+        color: '#27273f'
+      })
+    }
+    images.forEach((path, index) => {
+      this.elements.push({
+        id: elementId('image'),
+        type: 'image',
+        path,
+        x: round(0.12 + index * 0.05),
+        y: round(clamp(baseY + (content ? 0.23 : 0) + index * 0.06, 0.08, 0.68)),
+        width: 0.7,
+        height: 0.28
+      })
+    })
+    const selected = this.elements[this.elements.length - 1]
+    this.dirty = true
+    this.setData({
+      showQuestionImporter: false,
+      questionDraft: { content: '', images: [] },
+      selectedTool: 'select',
+      selectedElementId: selected?.id || '',
+      hasSelection: Boolean(selected)
+    })
+    this.refreshState()
+    this.renderCanvas()
+    wx.showToast({ title: '题目已放到画布', icon: 'success' })
+  },
+
   chooseImage() {
     wx.chooseMedia({
       count: 1,
@@ -315,7 +448,7 @@ Page({
     const selected = this.findSelected()
     if (!selected) return
     wx.showModal({
-      title: selected.type === 'image' ? '移除这张图片？' : '移除这段文字？',
+      title: selected.type === 'image' ? '移除这张图片？' : selected.kind === 'question' ? '移除这道题目？' : '移除这段文字？',
       confirmText: '移除',
       confirmColor: '#a64132',
       success: result => {
@@ -474,15 +607,34 @@ Page({
     const x = element.x * this.canvasWidth
     const y = element.y * this.canvasHeight
     const fontSize = element.fontSize * this.canvasWidth
-    const maxWidth = element.width * this.canvasWidth
+    const isQuestion = element.kind === 'question'
+    const padding = isQuestion ? 14 : 0
+    const labelHeight = isQuestion ? fontSize * 1.55 : 0
+    const maxWidth = element.width * this.canvasWidth - padding * 2
     ctx.save()
-    ctx.fillStyle = element.color || '#27273f'
     ctx.font = `600 ${fontSize}px sans-serif`
     ctx.textBaseline = 'top'
     const lines = this.wrapText(ctx, element.text, maxWidth)
     const lineHeight = fontSize * 1.45
-    lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight))
-    element.height = round(Math.max(lineHeight * lines.length / this.canvasHeight, 0.06))
+    const contentHeight = lineHeight * lines.length
+    element.height = round(Math.max((contentHeight + labelHeight + padding * 2) / this.canvasHeight, 0.06))
+    if (isQuestion) {
+      const cardWidth = element.width * this.canvasWidth
+      const cardHeight = element.height * this.canvasHeight
+      ctx.fillStyle = '#f5f4ff'
+      ctx.strokeStyle = '#d8d5ff'
+      ctx.lineWidth = 1
+      ctx.fillRect(x, y, cardWidth, cardHeight)
+      ctx.strokeRect(x, y, cardWidth, cardHeight)
+      ctx.fillStyle = '#6964e8'
+      ctx.font = `700 ${fontSize * 0.82}px sans-serif`
+      ctx.fillText('外部题目', x + padding, y + padding)
+      ctx.font = `600 ${fontSize}px sans-serif`
+    }
+    ctx.fillStyle = element.color || '#27273f'
+    const textX = x + padding
+    const textY = y + padding + labelHeight
+    lines.forEach((line, index) => ctx.fillText(line, textX, textY + index * lineHeight))
     if (element.id === this.data.selectedElementId) this.drawSelection(ctx, element)
     ctx.restore()
   },

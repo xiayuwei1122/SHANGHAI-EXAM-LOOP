@@ -26,6 +26,7 @@ function saveMethod(input) {
     id: input.id || `method-${now}-${Math.random().toString(36).slice(2, 8)}`,
     title: text(input.title),
     category: text(input.category) || '未分类',
+    content: text(input.content),
     recognition: text(input.recognition),
     steps: text(input.steps),
     pitfalls: text(input.pitfalls),

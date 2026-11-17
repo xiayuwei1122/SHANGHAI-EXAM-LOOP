@@ -53,7 +53,7 @@ Page({
       ...method,
       kind: 'structured',
       kindLabel: '方法卡',
-      summary: snippet(method.recognition || method.steps || method.notes) || '还没有补充方法说明',
+      summary: snippet(method.content || method.recognition || method.steps || method.notes) || '还没有补充方法说明',
       dateText: dateText(method.updatedAt),
       exampleCount: (method.examples || []).length,
       imageCount: (method.images || []).length + (method.examples || []).reduce(
@@ -82,8 +82,9 @@ Page({
       if (category !== '全部' && item.category !== category) return false
       if (!normalizedKeyword) return true
       const searchable = [
-        item.title, item.category, item.kindLabel, item.recognition, item.steps,
-        item.pitfalls, item.notes, item.searchableText, ...(item.tags || [])
+        item.title, item.category, item.kindLabel, item.content, item.recognition, item.steps,
+        item.pitfalls, item.notes, item.searchableText, ...(item.tags || []),
+        ...((item.examples || []).map(example => [example.content, example.stem, example.answer, example.explanation].join(' ')))
       ].join(' ').toLowerCase()
       return searchable.includes(normalizedKeyword)
     })

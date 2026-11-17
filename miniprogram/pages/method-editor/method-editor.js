@@ -4,6 +4,7 @@ const EMPTY_FORM = {
   id: '',
   title: '',
   category: '',
+  content: '',
   recognition: '',
   steps: '',
   pitfalls: '',
@@ -14,7 +15,36 @@ const EMPTY_FORM = {
   createdAt: 0
 }
 
-const EMPTY_EXTERNAL = { source: '', stem: '', answer: '', analysis: '', images: [] }
+const EMPTY_EXTERNAL = { content: '', images: [] }
+
+function clean(value) { return typeof value === 'string' ? value.trim() : '' }
+
+function legacyMethodContent(source) {
+  if (clean(source?.content)) return clean(source.content)
+  return [
+    ['识别信号', source?.recognition],
+    ['解题步骤', source?.steps],
+    ['易错点', source?.pitfalls],
+    ['我的补充', source?.notes]
+  ].filter(([, value]) => clean(value))
+    .map(([label, value]) => `${label}\n${clean(value)}`)
+    .join('\n\n')
+}
+
+function externalQuestionContent(example) {
+  if (clean(example?.content)) return clean(example.content)
+  return [
+    clean(example?.paperTitle) && example.paperTitle !== '外部题目' ? `来源：${clean(example.paperTitle)}` : '',
+    clean(example?.stem) ? `题目：\n${clean(example.stem)}` : '',
+    clean(example?.answer) ? `参考答案：${clean(example.answer)}` : '',
+    clean(example?.explanation) ? `解析：\n${clean(example.explanation)}` : ''
+  ].filter(Boolean).join('\n\n')
+}
+
+function normalizeExample(example) {
+  if (example?.sourceType !== 'external') return example
+  return { ...example, content: externalQuestionContent(example), images: example.images || [] }
+}
 
 Page({
   data: {
@@ -33,8 +63,9 @@ Page({
     const form = source ? {
       ...EMPTY_FORM,
       ...source,
+      content: legacyMethodContent(source),
       tagsText: (source.tags || []).join('，'),
-      examples: source.examples || [],
+      examples: (source.examples || []).map(normalizeExample),
       images: source.images || []
     } : { ...EMPTY_FORM }
     this.setData({ form, isEditing: Boolean(options.id), externalOnReady: options.external === '1' })
@@ -166,20 +197,21 @@ Page({
 
   addExternalExample() {
     const external = this.data.externalForm
-    if (!external.stem.trim() && !external.images.length) {
-      wx.showToast({ title: '请填写题干或添加题目图片', icon: 'none' })
+    if (!external.content.trim() && !external.images.length) {
+      wx.showToast({ title: '请填写题目内容或添加图片', icon: 'none' })
       return
     }
     const example = {
       id: `external-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       sourceType: 'external',
-      paperTitle: external.source.trim() || '外部题目',
+      paperTitle: '外部题目',
       number: '',
       moduleName: '外部导入',
       type: '',
-      stem: external.stem.trim(),
-      answer: external.answer.trim(),
-      explanation: external.analysis.trim(),
+      content: external.content.trim(),
+      stem: '',
+      answer: '',
+      explanation: '',
       userAnswer: '',
       images: external.images.slice()
     }

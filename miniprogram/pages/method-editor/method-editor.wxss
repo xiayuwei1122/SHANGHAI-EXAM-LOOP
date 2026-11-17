@@ -16,6 +16,8 @@
 .textarea-field:first-child { margin-top: 0; }
 .textarea-field small { display: block; margin-top: 5rpx; color: var(--muted); font-size: 20rpx; }
 .textarea-field textarea { width: 100%; min-height: 120rpx; margin-top: 11rpx; padding: 18rpx; box-sizing: border-box; border: 1rpx solid #e1e3f0; border-radius: 16rpx; background: #fbfbff; font-size: 25rpx; line-height: 1.65; }
+.method-content-card { padding-bottom: 26rpx; }
+.method-content textarea { height: 430rpx; min-height: 430rpx; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; margin: 32rpx 2rpx 15rpx; font-size: 28rpx; font-weight: 800; }
 .section-heading label { color: var(--muted); font-size: 21rpx; font-weight: 500; }
 .example-section-heading > view { display: flex; align-items: center; gap: 12rpx; }
@@ -23,6 +25,7 @@
 .example-section-heading button::after { border: 0; }
 .external-editor { margin-top: 14rpx; padding: 26rpx; border-color: #cfe7e0 !important; background: #f2fbf8 !important; }
 .external-title { font-size: 27rpx; font-weight: 800; }
+.external-content textarea { height: 360rpx; min-height: 360rpx; }
 .external-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14rpx; margin-top: 22rpx; }
 .external-note { margin-top: 13rpx; color: var(--muted); font-size: 20rpx; line-height: 1.6; }
 .external-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 14rpx; margin-top: 22rpx; }

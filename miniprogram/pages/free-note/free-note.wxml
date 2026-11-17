@@ -11,6 +11,7 @@
         <view class="toolbar-divider"></view>
         <view class="action-tool" bindtap="addText"><text>T</text><label>文字</label></view>
         <view class="action-tool" bindtap="chooseImage"><text>▧</text><label>图片</label></view>
+        <view class="action-tool question-tool" bindtap="startQuestionImport"><text>题</text><label>导入题目</label></view>
         <view class="toolbar-divider"></view>
         <view class="history-tool {{canUndo ? '' : 'disabled'}}" bindtap="undo">↶</view>
         <view class="history-tool {{canRedo ? '' : 'disabled'}}" bindtap="redo">↷</view>
@@ -29,6 +30,19 @@
         <view class="paper-option {{background === item.value ? 'active' : ''}}" wx:for="{{backgroundOptions}}" wx:key="value" data-background="{{item.value}}" bindtap="setBackground">{{item.label}}</view>
       </view>
     </scroll-view>
+  </view>
+
+  <view class="question-importer" wx:if="{{showQuestionImporter}}">
+    <view class="question-import-head"><view><text>导入外部题目</text><label>不用拆分字段，把想保留的内容都写在一起。</label></view></view>
+    <textarea value="{{questionDraft.content}}" bindinput="inputQuestionDraft" placeholder="直接粘贴题干、选项、答案、解析或你的想法……" maxlength="5000" />
+    <view class="question-images">
+      <view class="question-image" wx:for="{{questionDraft.images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="previewQuestionImage" />
+        <button data-index="{{index}}" catchtap="removeQuestionImage">×</button>
+      </view>
+      <view class="question-image-add" wx:if="{{questionDraft.images.length < 3}}" bindtap="chooseQuestionImages"><text>＋</text><label>题目图片</label></view>
+    </view>
+    <view class="question-import-actions"><button bindtap="cancelQuestionImport">取消</button><button class="primary" bindtap="addExternalQuestion">放到笔记</button></view>
   </view>
 
   <view class="empty-note-state" wx:if="{{!elementCount}}">
