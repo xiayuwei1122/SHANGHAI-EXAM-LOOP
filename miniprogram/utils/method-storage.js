@@ -1,6 +1,7 @@
+const { createJsonDocumentStore } = require('./local-json-store')
+
 const METHODS_KEY = 'corn_exam_methods_v1'
 const PREFILL_KEY = 'corn_exam_method_prefill_v1'
-let methodsCache = null
 
 function text(value) { return typeof value === 'string' ? value.trim() : '' }
 
@@ -9,25 +10,56 @@ function normalizeTags(tags) {
   return Array.from(new Set(values.map(text).filter(Boolean))).slice(0, 12)
 }
 
-function readMethods() {
-  if (methodsCache) return methodsCache
-  const methods = wx.getStorageSync(METHODS_KEY)
-  methodsCache = Array.isArray(methods) ? methods : []
-  return methodsCache
+function summarize(method) {
+  const examples = method.examples || []
+  const images = method.images || []
+  return {
+    title: method.title,
+    category: method.category,
+    content: String(method.content || '').slice(0, 500),
+    tags: method.tags,
+    exampleCount: examples.length,
+    imageCount: images.length + examples.reduce(
+      (count, example) => count + (example.images || []).length,
+      0
+    ),
+    searchableText: [
+      method.title,
+      method.category,
+      method.content,
+      method.recognition,
+      method.steps,
+      method.pitfalls,
+      method.notes,
+      ...(method.tags || []),
+      ...examples.map(example => [
+        example.content,
+        example.stem,
+        example.answer,
+        example.explanation
+      ].join(' '))
+    ].join(' ').trim().slice(0, 3000),
+    createdAt: method.createdAt,
+    updatedAt: method.updatedAt
+  }
 }
 
-function getMethods() {
-  return readMethods().slice().sort((left, right) => (right.updatedAt || 0) - (left.updatedAt || 0))
-}
+const store = createJsonDocumentStore({
+  legacyKey: METHODS_KEY,
+  indexFile: 'methods-index.json',
+  directory: 'methods',
+  summarize
+})
 
-function getMethod(id) {
-  return getMethods().find(item => item.id === id) || null
-}
+function getMethods() { return store.list() }
+
+function getMethodSummaries() { return store.listSummaries() }
+
+function getMethod(id) { return store.get(id) }
 
 function saveMethod(input) {
   const now = Date.now()
-  const methods = getMethods()
-  const previous = input.id ? methods.find(item => item.id === input.id) : null
+  const previous = input.id ? getMethod(input.id) : null
   const method = {
     id: input.id || `method-${now}-${Math.random().toString(36).slice(2, 8)}`,
     title: text(input.title),
@@ -43,21 +75,10 @@ function saveMethod(input) {
     createdAt: previous?.createdAt || input.createdAt || now,
     updatedAt: now
   }
-  const next = [method].concat(methods.filter(item => item.id !== method.id))
-  methodsCache = next
-  wx.setStorageSync(METHODS_KEY, methodsCache)
-  return method
+  return store.save(method)
 }
 
-function removeMethod(id) {
-  const methods = getMethods()
-  const removed = methods.find(item => item.id === id) || null
-  const next = methods.filter(item => item.id !== id)
-  methodsCache = next
-  if (next.length) wx.setStorageSync(METHODS_KEY, methodsCache)
-  else wx.removeStorageSync(METHODS_KEY)
-  return removed
-}
+function removeMethod(id) { return store.remove(id) }
 
 function savePrefill(prefill) { wx.setStorageSync(PREFILL_KEY, prefill) }
 
@@ -67,12 +88,16 @@ function consumePrefill() {
   return prefill
 }
 
+function getEstimatedBytes() { return store.estimatedBytes() }
+
 module.exports = {
   getMethods,
+  getMethodSummaries,
   getMethod,
   saveMethod,
   removeMethod,
   savePrefill,
   consumePrefill,
-  normalizeTags
+  normalizeTags,
+  getEstimatedBytes
 }

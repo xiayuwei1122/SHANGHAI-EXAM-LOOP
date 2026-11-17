@@ -1,4 +1,5 @@
 const notebookStorage = require('../../utils/notebook-storage')
+const mediaStorage = require('../../utils/media-storage')
 
 const DEFAULT_CATEGORY = '随手记'
 const COLORS = ['#27273f', '#f0527e', '#ff9d3d', '#2eac83', '#4d86e8', '#7467ef']
@@ -298,15 +299,9 @@ Page({
   },
 
   persistImage(tempFilePath) {
-    return new Promise(resolve => {
-      wx.saveFile({
-        tempFilePath,
-        success: saved => resolve(saved.savedFilePath),
-        fail: () => {
-          wx.showToast({ title: '图片保存失败', icon: 'none' })
-          resolve('')
-        }
-      })
+    return mediaStorage.saveCompressedImage(tempFilePath).catch(error => {
+      wx.showToast({ title: error.userMessage || '图片保存失败', icon: 'none' })
+      return ''
     })
   },
 
@@ -389,14 +384,11 @@ Page({
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: result => {
+      success: async result => {
         const tempFilePath = result.tempFiles?.[0]?.tempFilePath
         if (!tempFilePath) return
-        wx.saveFile({
-          tempFilePath,
-          success: saved => this.addSavedImage(saved.savedFilePath),
-          fail: () => wx.showToast({ title: '图片保存失败', icon: 'none' })
-        })
+        const path = await this.persistImage(tempFilePath)
+        if (path) this.addSavedImage(path)
       },
       fail: error => {
         if (!String(error.errMsg || '').includes('cancel')) wx.showToast({ title: '图片选择失败', icon: 'none' })
@@ -678,13 +670,19 @@ Page({
   },
 
   saveNote(silent) {
-    const note = notebookStorage.saveNote({
-      id: this.data.id,
-      title: this.data.title,
-      category: this.data.category,
-      background: this.data.background,
-      elements: clone(this.elements)
-    })
+    let note
+    try {
+      note = notebookStorage.saveNote({
+        id: this.data.id,
+        title: this.data.title,
+        category: this.data.category,
+        background: this.data.background,
+        elements: clone(this.elements)
+      })
+    } catch (error) {
+      wx.showToast({ title: error.userMessage || '笔记保存失败', icon: 'none' })
+      return null
+    }
     const currentPaths = notebookStorage.getImagePaths(note)
     this.originalImagePaths.filter(path => !currentPaths.includes(path)).forEach(path => {
       wx.removeSavedFile({ filePath: path, fail() {} })
@@ -698,8 +696,7 @@ Page({
   },
 
   saveAndBack() {
-    this.saveNote(false)
-    wx.navigateBack({ delta: 1 })
+    if (this.saveNote(false)) wx.navigateBack({ delta: 1 })
   },
 
   removeNote() {

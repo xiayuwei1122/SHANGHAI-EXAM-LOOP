@@ -1,48 +1,45 @@
+const { createJsonDocumentStore } = require('./local-json-store')
+
 const NOTES_KEY = 'corn_exam_free_notes_v1'
-let notesCache = null
 
 function cleanText(value) { return typeof value === 'string' ? value.trim() : '' }
 
-function readNotes() {
-  if (notesCache) return notesCache
-  const notes = wx.getStorageSync(NOTES_KEY)
-  notesCache = Array.isArray(notes) ? notes : []
-  return notesCache
-}
-
-function getNotes() {
-  return readNotes().slice().sort((left, right) => (right.updatedAt || 0) - (left.updatedAt || 0))
-}
-
-function getNote(id) { return getNotes().find(note => note.id === id) || null }
-
-function getNoteSummaries() {
-  return getNotes().map(note => {
-    const elements = note.elements || []
-    const searchableText = elements
+function summarize(note) {
+  const elements = note.elements || []
+  return {
+    title: note.title,
+    category: note.category,
+    background: note.background,
+    createdAt: note.createdAt,
+    updatedAt: note.updatedAt,
+    elementCount: elements.length,
+    strokeCount: elements.filter(element => element.type === 'stroke').length,
+    imageCount: elements.filter(element => element.type === 'image').length,
+    searchableText: elements
       .filter(element => element.type === 'text')
       .map(element => element.text)
       .join(' ')
       .trim()
-    return {
-      id: note.id,
-      title: note.title,
-      category: note.category,
-      background: note.background,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-      elementCount: elements.length,
-      strokeCount: elements.filter(element => element.type === 'stroke').length,
-      imageCount: elements.filter(element => element.type === 'image').length,
-      searchableText
-    }
-  })
+      .slice(0, 2000)
+  }
 }
+
+const store = createJsonDocumentStore({
+  legacyKey: NOTES_KEY,
+  indexFile: 'free-notes-index.json',
+  directory: 'free-notes',
+  summarize
+})
+
+function getNotes() { return store.list() }
+
+function getNote(id) { return store.get(id) }
+
+function getNoteSummaries() { return store.listSummaries() }
 
 function saveNote(input) {
   const now = Date.now()
-  const notes = getNotes()
-  const previous = input.id ? notes.find(note => note.id === input.id) : null
+  const previous = input.id ? getNote(input.id) : null
   const note = {
     id: input.id || `note-${now}-${Math.random().toString(36).slice(2, 8)}`,
     title: cleanText(input.title) || '未命名笔记',
@@ -52,19 +49,11 @@ function saveNote(input) {
     createdAt: previous?.createdAt || input.createdAt || now,
     updatedAt: now
   }
-  notesCache = [note].concat(notes.filter(item => item.id !== note.id))
-  wx.setStorageSync(NOTES_KEY, notesCache)
-  return note
+  return store.save(note)
 }
 
 function removeNote(id) {
-  const notes = getNotes()
-  const removed = notes.find(note => note.id === id) || null
-  const next = notes.filter(note => note.id !== id)
-  notesCache = next
-  if (next.length) wx.setStorageSync(NOTES_KEY, notesCache)
-  else wx.removeStorageSync(NOTES_KEY)
-  return removed
+  return store.remove(id)
 }
 
 function getImagePaths(note) {
@@ -73,4 +62,14 @@ function getImagePaths(note) {
     .map(element => element.path)
 }
 
-module.exports = { getNotes, getNote, getNoteSummaries, saveNote, removeNote, getImagePaths }
+function getEstimatedBytes() { return store.estimatedBytes() }
+
+module.exports = {
+  getNotes,
+  getNote,
+  getNoteSummaries,
+  saveNote,
+  removeNote,
+  getImagePaths,
+  getEstimatedBytes
+}

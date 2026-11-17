@@ -66,7 +66,7 @@ Page({
     this.setData({
       attemptCount: history.length,
       bestScore: best == null ? '--' : `${best}`,
-      methodCount: methodStorage.getMethods().length + notebookStorage.getNotes().length
+      methodCount: methodStorage.getMethodSummaries().length + notebookStorage.getNoteSummaries().length
     })
     this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage)
   },

@@ -53,4 +53,7 @@
 .page-status { min-width: 105rpx; color: #8b8b9c; text-align: center; }
 .page-status text { color: #625ce0; font-size: 30rpx; font-weight: 800; }
 .page-status label { margin-left: 6rpx; font-size: 21rpx; }
-.local-note { margin: 30rpx 16rpx 0; color: #858596; font-size: 21rpx; line-height: 1.7; text-align: center; }
+.storage-note { margin: 30rpx 0 0; padding: 22rpx 24rpx; border: 1rpx solid #e5e6f1; border-radius: 18rpx; color: #858596; background: #fff; font-size: 21rpx; line-height: 1.7; }
+.storage-title { margin-bottom: 5rpx; color: #4f4d72; font-weight: 800; }
+.storage-note.warning { border-color: #f0cf9b; color: #98651e; background: #fff9ed; }
+.storage-note.warning .storage-title { color: #b26c13; }

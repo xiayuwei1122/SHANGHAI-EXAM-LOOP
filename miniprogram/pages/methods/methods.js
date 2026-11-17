@@ -1,5 +1,6 @@
 const methodStorage = require('../../utils/method-storage')
 const notebookStorage = require('../../utils/notebook-storage')
+const mediaStorage = require('../../utils/media-storage')
 
 const PAGE_SIZE = 6
 
@@ -31,7 +32,9 @@ Page({
     categories: [],
     selectedCategory: '全部',
     keyword: '',
-    loading: true
+    loading: true,
+    storageUsageText: '正在统计本机空间…',
+    storageWarning: false
   },
 
   onShow() {
@@ -52,17 +55,14 @@ Page({
       summary: noteSummary(note),
       dateText: dateText(note.updatedAt)
     }))
-    const methods = methodStorage.getMethods().map(method => ({
+    const methods = methodStorage.getMethodSummaries().map(method => ({
       ...method,
       kind: 'structured',
       kindLabel: '方法卡',
-      summary: snippet(method.content || method.recognition || method.steps || method.notes) || '还没有补充方法说明',
+      summary: snippet(method.content) || '还没有补充方法说明',
       dateText: dateText(method.updatedAt),
-      exampleCount: (method.examples || []).length,
-      imageCount: (method.images || []).length + (method.examples || []).reduce(
-        (count, example) => count + (example.images || []).length,
-        0
-      )
+      exampleCount: method.exampleCount || 0,
+      imageCount: method.imageCount || 0
     }))
     this.allItems = notes.concat(methods).sort((left, right) => (right.updatedAt || 0) - (left.updatedAt || 0))
     const counts = this.allItems.reduce((result, item) => {
@@ -78,6 +78,18 @@ Page({
     this.hasLoaded = true
     this.setData({ categories, entryCount: this.allItems.length, selectedCategory, loading: false })
     this.applyFilters(selectedCategory, this.data.keyword, this.data.currentPage)
+    this.loadStorageUsage()
+  },
+
+  async loadStorageUsage() {
+    const savedFileBytes = await mediaStorage.getSavedFileBytes()
+    const documentBytes = notebookStorage.getEstimatedBytes() + methodStorage.getEstimatedBytes()
+    const usedBytes = savedFileBytes + documentBytes
+    const ratio = usedBytes / mediaStorage.LOCAL_FILE_LIMIT_BYTES
+    this.setData({
+      storageUsageText: `本机约 ${mediaStorage.formatBytes(usedBytes)} / 200 MB`,
+      storageWarning: ratio >= 0.75
+    })
   },
 
   applyFilters(category, keyword, requestedPage = 1) {
@@ -86,9 +98,7 @@ Page({
       if (category !== '全部' && item.category !== category) return false
       if (!normalizedKeyword) return true
       const searchable = [
-        item.title, item.category, item.kindLabel, item.content, item.recognition, item.steps,
-        item.pitfalls, item.notes, item.searchableText, ...(item.tags || []),
-        ...((item.examples || []).map(example => [example.content, example.stem, example.answer, example.explanation].join(' ')))
+        item.title, item.category, item.kindLabel, item.content, item.searchableText, ...(item.tags || [])
       ].join(' ').toLowerCase()
       return searchable.includes(normalizedKeyword)
     })

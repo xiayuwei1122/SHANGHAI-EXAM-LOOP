@@ -1,4 +1,5 @@
 const methodStorage = require('../../utils/method-storage')
+const mediaStorage = require('../../utils/media-storage')
 
 const EMPTY_FORM = {
   id: '',
@@ -150,15 +151,9 @@ Page({
   },
 
   persistImage(tempFilePath) {
-    return new Promise(resolve => {
-      wx.saveFile({
-        tempFilePath,
-        success: result => resolve(result.savedFilePath),
-        fail: () => {
-          wx.showToast({ title: '图片保存失败', icon: 'none' })
-          resolve('')
-        }
-      })
+    return mediaStorage.saveCompressedImage(tempFilePath).catch(error => {
+      wx.showToast({ title: error.userMessage || '图片保存失败', icon: 'none' })
+      return ''
     })
   },
 
@@ -250,10 +245,16 @@ Page({
       wx.showToast({ title: '先给方法起个标题', icon: 'none' })
       return
     }
-    const method = methodStorage.saveMethod({
-      ...this.data.form,
-      tags: this.data.form.tagsText
-    })
+    let method
+    try {
+      method = methodStorage.saveMethod({
+        ...this.data.form,
+        tags: this.data.form.tagsText
+      })
+    } catch (error) {
+      wx.showToast({ title: error.userMessage || '方法卡保存失败', icon: 'none' })
+      return
+    }
     this.setData({ 'form.id': method.id })
     wx.showToast({ title: '方法卡已保存', icon: 'success' })
     wx.navigateBack({ delta: 1 })

@@ -49,5 +49,8 @@
     <button class="page-button" disabled="{{currentPage >= totalPages}}" bindtap="nextPage">下一页</button>
   </view>
 
-  <view class="local-note">当前笔记只保存在本机，不会上传。清理微信数据或更换设备前请注意备份。</view>
+  <view class="storage-note {{storageWarning ? 'warning' : ''}}">
+    <view class="storage-title">{{storageUsageText}}</view>
+    <view>图片会自动压缩，笔记已分文件保存。当前仍只保存在本机，更换设备前请注意备份。</view>
+  </view>
 </view>
