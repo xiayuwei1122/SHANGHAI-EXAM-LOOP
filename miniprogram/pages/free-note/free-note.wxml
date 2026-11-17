@@ -1,0 +1,50 @@
+<view class="free-note-page">
+  <view class="note-meta">
+    <input class="note-title" value="{{title}}" data-field="title" bindinput="inputMeta" placeholder="给这页起个名字" maxlength="60" />
+    <input class="note-category" value="{{category}}" data-field="category" bindinput="inputMeta" placeholder="分类" maxlength="24" />
+  </view>
+
+  <scroll-view class="toolbar-scroll" scroll-x="true" enable-flex="true">
+    <view class="toolbar">
+      <view class="tool {{selectedTool === item.value ? 'active' : ''}}" wx:for="{{tools}}" wx:key="value" data-tool="{{item.value}}" bindtap="setTool"><text>{{item.icon}}</text><label>{{item.label}}</label></view>
+      <view class="toolbar-divider"></view>
+      <view class="action-tool" bindtap="addText"><text>T</text><label>文字</label></view>
+      <view class="action-tool" bindtap="chooseImage"><text>▧</text><label>图片</label></view>
+      <view class="toolbar-divider"></view>
+      <view class="history-tool {{canUndo ? '' : 'disabled'}}" bindtap="undo">↶</view>
+      <view class="history-tool {{canRedo ? '' : 'disabled'}}" bindtap="redo">↷</view>
+    </view>
+  </scroll-view>
+
+  <view class="style-row">
+    <view class="color-dot {{selectedColor === item ? 'active' : ''}}" style="background: {{item}}" wx:for="{{colors}}" wx:key="*this" data-color="{{item}}" bindtap="setColor"></view>
+    <view class="width-options">
+      <view class="width-dot {{selectedWidth === item ? 'active' : ''}}" wx:for="{{widths}}" wx:key="*this" data-width="{{item}}" bindtap="setWidth"><text style="width: {{item + 3}}rpx; height: {{item + 3}}rpx;"></text></view>
+    </view>
+  </view>
+
+  <scroll-view class="paper-scroll" scroll-x="true" enable-flex="true">
+    <view class="paper-options">
+      <view class="paper-option {{background === item.value ? 'active' : ''}}" wx:for="{{backgroundOptions}}" wx:key="value" data-background="{{item.value}}" bindtap="setBackground">{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="selection-bar" wx:if="{{hasSelection}}">
+    <text>拖动画布中的虚线框调整位置</text>
+    <button data-direction="down" bindtap="scaleSelected">缩小</button>
+    <button data-direction="up" bindtap="scaleSelected">放大</button>
+    <button class="danger" bindtap="deleteSelected">移除</button>
+  </view>
+
+  <view class="canvas-shell">
+    <canvas id="freeCanvas" type="2d" class="free-canvas" bindtouchstart="touchStart" catchtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="touchCancel"></canvas>
+    <view class="canvas-tip" wx:if="{{!elementCount}}">用笔随手画，或者添加文字和题目图片</view>
+  </view>
+
+  <view class="note-footer">
+    <view><text>{{elementCount}} 个内容</text><label>离开页面也会自动保存</label></view>
+    <button class="clear-button" bindtap="clearCanvas">清空画布</button>
+  </view>
+  <button class="btn btn-primary save-note" bindtap="saveAndBack">保存并返回</button>
+  <button class="delete-note" wx:if="{{isEditing}}" bindtap="removeNote">删除这张笔记</button>
+</view>

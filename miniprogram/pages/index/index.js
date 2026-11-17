@@ -2,6 +2,7 @@ const { catalog } = require('../../data/index')
 const { DEFAULT_EXAM_TYPE, examTypes } = require('../../data/exam-types')
 const storage = require('../../utils/storage')
 const methodStorage = require('../../utils/method-storage')
+const notebookStorage = require('../../utils/notebook-storage')
 const {
   buildExamTypeOptions,
   buildYearOptions,
@@ -65,7 +66,7 @@ Page({
     this.setData({
       attemptCount: history.length,
       bestScore: best == null ? '--' : `${best}`,
-      methodCount: methodStorage.getMethods().length
+      methodCount: methodStorage.getMethods().length + notebookStorage.getNotes().length
     })
     this.applyFilters(this.data.selectedExamType, this.data.selectedYear, this.data.currentPage)
   },

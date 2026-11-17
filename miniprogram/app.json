@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/history/history",
     "pages/methods/methods",
-    "pages/method-editor/method-editor"
+    "pages/method-editor/method-editor",
+    "pages/free-note/free-note"
   ],
   "subpackages": [
     {
