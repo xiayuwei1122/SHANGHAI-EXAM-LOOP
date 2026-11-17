@@ -1,6 +1,8 @@
 const methodStorage = require('../../utils/method-storage')
 const notebookStorage = require('../../utils/notebook-storage')
 
+const PAGE_SIZE = 6
+
 function snippet(value) {
   const content = String(value || '').trim()
   return content.length > 70 ? `${content.slice(0, 70)}…` : content
@@ -27,6 +29,10 @@ Page({
   data: {
     items: [],
     entryCount: 0,
+    matchCount: 0,
+    currentPage: 1,
+    totalPages: 1,
+    hasPagination: false,
     categories: [],
     selectedCategory: '全部',
     keyword: ''
@@ -67,12 +73,12 @@ Page({
       ? this.data.selectedCategory
       : '全部'
     this.setData({ categories, entryCount: this.allItems.length, selectedCategory })
-    this.applyFilters(selectedCategory, this.data.keyword)
+    this.applyFilters(selectedCategory, this.data.keyword, this.data.currentPage)
   },
 
-  applyFilters(category, keyword) {
+  applyFilters(category, keyword, requestedPage = 1) {
     const normalizedKeyword = String(keyword || '').trim().toLowerCase()
-    const items = (this.allItems || []).filter(item => {
+    const filtered = (this.allItems || []).filter(item => {
       if (category !== '全部' && item.category !== category) return false
       if (!normalizedKeyword) return true
       const searchable = [
@@ -81,12 +87,35 @@ Page({
       ].join(' ').toLowerCase()
       return searchable.includes(normalizedKeyword)
     })
-    this.setData({ items, selectedCategory: category, keyword })
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+    const currentPage = Math.min(Math.max(Number(requestedPage) || 1, 1), totalPages)
+    const start = (currentPage - 1) * PAGE_SIZE
+    this.setData({
+      items: filtered.slice(start, start + PAGE_SIZE),
+      matchCount: filtered.length,
+      currentPage,
+      totalPages,
+      hasPagination: filtered.length > PAGE_SIZE,
+      selectedCategory: category,
+      keyword
+    })
   },
 
   search(event) { this.applyFilters(this.data.selectedCategory, event.detail.value) },
 
   selectCategory(event) { this.applyFilters(event.currentTarget.dataset.name, this.data.keyword) },
+
+  previousPage() {
+    if (this.data.currentPage <= 1) return
+    this.applyFilters(this.data.selectedCategory, this.data.keyword, this.data.currentPage - 1)
+    wx.pageScrollTo({ selector: '#method-list-anchor', duration: 200 })
+  },
+
+  nextPage() {
+    if (this.data.currentPage >= this.data.totalPages) return
+    this.applyFilters(this.data.selectedCategory, this.data.keyword, this.data.currentPage + 1)
+    wx.pageScrollTo({ selector: '#method-list-anchor', duration: 200 })
+  },
 
   createFreeNote() { wx.navigateTo({ url: '/pages/free-note/free-note' }) },
 

@@ -1,7 +1,7 @@
 const notebookStorage = require('../../utils/notebook-storage')
 
 const DEFAULT_CATEGORY = '随手记'
-const COLORS = ['#302b28', '#a64132', '#d58a2d', '#48745b', '#496f88', '#76569a']
+const COLORS = ['#27273f', '#f0527e', '#ff9d3d', '#2eac83', '#4d86e8', '#7467ef']
 const WIDTHS = [3, 6, 11]
 
 function clone(value) { return JSON.parse(JSON.stringify(value)) }
@@ -398,7 +398,7 @@ Page({
     const ctx = this.context
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0)
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-    ctx.fillStyle = '#fffdf8'
+    ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
     this.drawBackground(ctx)
     this.elements.forEach(element => {
@@ -412,8 +412,8 @@ Page({
     const style = this.data.background
     if (style === 'blank') return
     ctx.save()
-    ctx.strokeStyle = style === 'lined' ? '#e8dcd0' : '#ece3d9'
-    ctx.fillStyle = '#ded2c5'
+    ctx.strokeStyle = style === 'lined' ? '#e5e7f3' : '#e9ebf5'
+    ctx.fillStyle = '#d9dceb'
     ctx.lineWidth = 0.7
     const gap = this.canvasWidth / 14
     if (style === 'lined') {
@@ -476,7 +476,7 @@ Page({
     const fontSize = element.fontSize * this.canvasWidth
     const maxWidth = element.width * this.canvasWidth
     ctx.save()
-    ctx.fillStyle = element.color || '#302b28'
+    ctx.fillStyle = element.color || '#27273f'
     ctx.font = `600 ${fontSize}px sans-serif`
     ctx.textBaseline = 'top'
     const lines = this.wrapText(ctx, element.text, maxWidth)
@@ -504,7 +504,7 @@ Page({
 
   drawSelection(ctx, element) {
     ctx.save()
-    ctx.strokeStyle = '#76569a'
+    ctx.strokeStyle = '#6964e8'
     ctx.lineWidth = 2
     ctx.setLineDash([6, 5])
     ctx.strokeRect(

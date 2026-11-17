@@ -11,7 +11,7 @@
 
   <view class="method-toolbar">
     <input class="search-input" value="{{keyword}}" bindinput="search" placeholder="搜索标题、分类或笔记文字" />
-    <view class="method-count">{{entryCount}} 篇</view>
+    <view class="method-count">{{matchCount}} 篇</view>
   </view>
 
   <scroll-view class="category-scroll" scroll-x="true" enable-flex="true" wx:if="{{categories.length}}">
@@ -20,6 +20,7 @@
     </view>
   </scroll-view>
 
+  <view id="method-list-anchor"></view>
   <view class="method-empty card" wx:if="{{!items.length}}">
     <view class="empty-icon">✎</view>
     <view class="empty-title">{{entryCount ? '没有匹配的内容' : '先写下第一张自由笔记吧'}}</view>
@@ -35,6 +36,12 @@
       <view class="method-meta" wx:if="{{item.kind === 'free'}}"><text>笔画 {{item.strokeCount}}</text><text>图片 {{item.imageCount}}</text><label>继续创作 ›</label></view>
       <view class="method-meta" wx:else><text>典型题 {{item.exampleCount}}</text><text>图片 {{item.imageCount}}</text><label>查看编辑 ›</label></view>
     </view>
+  </view>
+
+  <view class="pagination" wx:if="{{hasPagination}}">
+    <button class="page-button" disabled="{{currentPage <= 1}}" bindtap="previousPage">上一页</button>
+    <view class="page-status"><text>{{currentPage}}</text><label>/ {{totalPages}} 页</label></view>
+    <button class="page-button" disabled="{{currentPage >= totalPages}}" bindtap="nextPage">下一页</button>
   </view>
 
   <view class="local-note">当前笔记只保存在本机，不会上传。清理微信数据或更换设备前请注意备份。</view>
