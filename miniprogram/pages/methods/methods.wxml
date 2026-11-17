@@ -22,7 +22,11 @@
   </scroll-view>
 
   <view id="method-list-anchor"></view>
-  <view class="method-empty card" wx:if="{{!items.length}}">
+  <view class="method-loading" wx:if="{{loading}}">
+    <view class="loading-card"><view class="loading-line wide"></view><view class="loading-line"></view><view class="loading-line short"></view></view>
+    <view class="loading-card"><view class="loading-line wide"></view><view class="loading-line"></view><view class="loading-line short"></view></view>
+  </view>
+  <view class="method-empty card" wx:elif="{{!items.length}}">
     <view class="empty-icon">✎</view>
     <view class="empty-title">{{entryCount ? '没有匹配的内容' : '先写下第一张自由笔记吧'}}</view>
     <view class="empty-note">{{entryCount ? '换个分类或关键词看看。' : '不需要想好格式，先写、先画，之后再慢慢整理。'}}</view>

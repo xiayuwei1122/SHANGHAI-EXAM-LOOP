@@ -15,6 +15,7 @@ const notes = Array.from({ length: 8 }, (_, index) => ({
 let storedNotes = notes.slice()
 let removedFilePath = ''
 let toastTitle = ''
+let nextTickCallback = null
 
 global.Page = definition => { pageDefinition = definition }
 global.wx = {
@@ -29,6 +30,7 @@ global.wx = {
   removeStorageSync(key) {
     if (key === 'corn_exam_free_notes_v1') storedNotes = []
   },
+  nextTick(callback) { nextTickCallback = callback },
   pageScrollTo() {},
   navigateTo() {},
   removeSavedFile({ filePath }) { removedFilePath = filePath },
@@ -45,6 +47,10 @@ const page = {
 }
 
 page.onShow()
+assert.strictEqual(page.data.loading, true)
+assert.strictEqual(page.data.items.length, 0)
+nextTickCallback()
+assert.strictEqual(page.data.loading, false)
 assert.strictEqual(page.data.items.length, 6)
 assert.strictEqual(page.data.matchCount, 8)
 assert.strictEqual(page.data.currentPage, 1)

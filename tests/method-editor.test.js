@@ -59,8 +59,8 @@ assert.strictEqual(methods[0].content, '先估算，再校验选项')
 assert.strictEqual(methods[0].examples[0].content, '纸质讲义\n某指标同比增长……\n答案：B')
 assert.deepStrictEqual(calls.backs, [1])
 
-memory.set('corn_exam_methods_v1', [{
-  id: 'legacy-method',
+const methodStorage = require('../miniprogram/utils/method-storage')
+const legacyMethod = methodStorage.saveMethod({
   title: '旧方法卡',
   category: '资料分析',
   recognition: '看到现期和基期',
@@ -73,9 +73,9 @@ memory.set('corn_exam_methods_v1', [{
     id: 'legacy-question', sourceType: 'external', paperTitle: '纸质卷',
     stem: '旧题干', answer: 'C', explanation: '旧解析', images: []
   }]
-}])
+})
 const legacyPage = createPage()
-legacyPage.onLoad({ id: 'legacy-method' })
+legacyPage.onLoad({ id: legacyMethod.id })
 assert.ok(legacyPage.data.form.content.includes('识别信号\n看到现期和基期'))
 assert.ok(legacyPage.data.form.content.includes('易错点\n注意单位'))
 assert.ok(legacyPage.data.form.examples[0].content.includes('参考答案：C'))

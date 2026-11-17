@@ -15,14 +15,9 @@ function dateText(timestamp) {
 }
 
 function noteSummary(note) {
-  const elements = note.elements || []
-  const strokes = elements.filter(item => item.type === 'stroke').length
-  const texts = elements.filter(item => item.type === 'text')
-  const images = elements.filter(item => item.type === 'image').length
-  const preview = texts.map(item => item.text).join(' ').trim()
-  if (preview) return snippet(preview)
-  if (!elements.length) return '一张空白画布，等你自由发挥'
-  return `手写 ${strokes} 笔 · 图片 ${images} 张`
+  if (note.searchableText) return snippet(note.searchableText)
+  if (!note.elementCount) return '一张空白画布，等你自由发挥'
+  return `手写 ${note.strokeCount} 笔 · 图片 ${note.imageCount} 张`
 }
 
 Page({
@@ -35,19 +30,27 @@ Page({
     hasPagination: false,
     categories: [],
     selectedCategory: '全部',
-    keyword: ''
+    keyword: '',
+    loading: true
   },
 
   onShow() {
-    const notes = notebookStorage.getNotes().map(note => ({
+    if (this.hasLoaded) {
+      this.loadItems()
+      return
+    }
+    const load = () => this.loadItems()
+    if (typeof wx.nextTick === 'function') wx.nextTick(load)
+    else load()
+  },
+
+  loadItems() {
+    const notes = notebookStorage.getNoteSummaries().map(note => ({
       ...note,
       kind: 'free',
       kindLabel: '自由笔记',
       summary: noteSummary(note),
-      dateText: dateText(note.updatedAt),
-      strokeCount: (note.elements || []).filter(item => item.type === 'stroke').length,
-      imageCount: (note.elements || []).filter(item => item.type === 'image').length,
-      searchableText: (note.elements || []).filter(item => item.type === 'text').map(item => item.text).join(' ')
+      dateText: dateText(note.updatedAt)
     }))
     const methods = methodStorage.getMethods().map(method => ({
       ...method,
@@ -72,7 +75,8 @@ Page({
     const selectedCategory = categories.some(item => item.name === this.data.selectedCategory)
       ? this.data.selectedCategory
       : '全部'
-    this.setData({ categories, entryCount: this.allItems.length, selectedCategory })
+    this.hasLoaded = true
+    this.setData({ categories, entryCount: this.allItems.length, selectedCategory, loading: false })
     this.applyFilters(selectedCategory, this.data.keyword, this.data.currentPage)
   },
 

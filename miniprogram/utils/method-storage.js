@@ -1,5 +1,6 @@
 const METHODS_KEY = 'corn_exam_methods_v1'
 const PREFILL_KEY = 'corn_exam_method_prefill_v1'
+let methodsCache = null
 
 function text(value) { return typeof value === 'string' ? value.trim() : '' }
 
@@ -8,10 +9,15 @@ function normalizeTags(tags) {
   return Array.from(new Set(values.map(text).filter(Boolean))).slice(0, 12)
 }
 
-function getMethods() {
+function readMethods() {
+  if (methodsCache) return methodsCache
   const methods = wx.getStorageSync(METHODS_KEY)
-  if (!Array.isArray(methods)) return []
-  return methods.slice().sort((left, right) => (right.updatedAt || 0) - (left.updatedAt || 0))
+  methodsCache = Array.isArray(methods) ? methods : []
+  return methodsCache
+}
+
+function getMethods() {
+  return readMethods().slice().sort((left, right) => (right.updatedAt || 0) - (left.updatedAt || 0))
 }
 
 function getMethod(id) {
@@ -38,7 +44,8 @@ function saveMethod(input) {
     updatedAt: now
   }
   const next = [method].concat(methods.filter(item => item.id !== method.id))
-  wx.setStorageSync(METHODS_KEY, next)
+  methodsCache = next
+  wx.setStorageSync(METHODS_KEY, methodsCache)
   return method
 }
 
@@ -46,7 +53,8 @@ function removeMethod(id) {
   const methods = getMethods()
   const removed = methods.find(item => item.id === id) || null
   const next = methods.filter(item => item.id !== id)
-  if (next.length) wx.setStorageSync(METHODS_KEY, next)
+  methodsCache = next
+  if (next.length) wx.setStorageSync(METHODS_KEY, methodsCache)
   else wx.removeStorageSync(METHODS_KEY)
   return removed
 }

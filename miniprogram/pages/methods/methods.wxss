@@ -18,6 +18,12 @@
 .category-chip { flex: none; padding: 12rpx 20rpx; border-radius: 999rpx; color: #67677c; background: #eceeff; font-size: 22rpx; }
 .category-chip.active { color: white; background: #6964e8; box-shadow: 0 7rpx 18rpx rgba(105,100,232,.24); }
 .method-list { display: flex; flex-direction: column; gap: 18rpx; }
+.method-loading { display: flex; flex-direction: column; gap: 18rpx; }
+.loading-card { padding: 30rpx; border: 1rpx solid #e7e8f4; border-radius: 22rpx; background: white; }
+.loading-line { width: 72%; height: 24rpx; margin-top: 20rpx; border-radius: 999rpx; background: #eff0f7; }
+.loading-line:first-child { margin-top: 0; }
+.loading-line.wide { width: 46%; height: 30rpx; background: #e8e7fb; }
+.loading-line.short { width: 32%; }
 .method-card { position: relative; overflow: hidden; padding: 28rpx; }
 .method-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7rpx; background: #ff91bd; }
 .method-card.structured::before { background: #5bc8a5; }
