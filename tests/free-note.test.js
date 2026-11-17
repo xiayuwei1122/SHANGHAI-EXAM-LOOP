@@ -49,4 +49,11 @@ reloaded.onLoad({ id: notes[0].id })
 assert.strictEqual(reloaded.data.isEditing, true)
 assert.strictEqual(reloaded.elements[0].text, '先找题目的识别信号')
 
+reloaded.clearCanvas()
+assert.strictEqual(reloaded.elements.length, 0)
+assert.strictEqual(reloaded.data.elementCount, 0)
+assert.strictEqual(reloaded.data.isEditing, true)
+reloaded.saveNote(true)
+assert.strictEqual(memory.get('corn_exam_free_notes_v1')[0].elements.length, 0)
+
 console.log('free-note.test.js: OK')
