@@ -1,8 +1,9 @@
 .methods-page { min-height: 100vh; padding-bottom: 60rpx; background: #f7f8ff; }
 .methods-page .card { border-color: #e7e8f4; background: #fff; box-shadow: 0 14rpx 38rpx rgba(75,72,140,.08); }
-.methods-hero { position: relative; overflow: hidden; padding: 36rpx; color: white; border: 0 !important; background: linear-gradient(135deg, #6964e8 0%, #8d73ef 52%, #f082b6 100%) !important; box-shadow: 0 22rpx 48rpx rgba(105,100,232,.24) !important; }
+.methods-hero { position: relative; overflow: hidden; padding: 36rpx; color: white; border: 0 !important; background: linear-gradient(145deg, #29283f, #454069 68%, #665785) !important; box-shadow: 0 22rpx 48rpx rgba(45,43,91,.22) !important; }
 .methods-hero::after { content: ""; position: absolute; right: -65rpx; top: -80rpx; width: 240rpx; height: 240rpx; border-radius: 50%; background: rgba(255,255,255,.12); }
-.methods-eyebrow { color: #fff1a8; font-size: 21rpx; font-weight: 800; letter-spacing: 4rpx; }
+.methods-corn { position: absolute; z-index: 2; right: 28rpx; top: 22rpx; font-size: 68rpx; transform: rotate(8deg); filter: drop-shadow(0 8rpx 12rpx rgba(0,0,0,.15)); }
+.methods-eyebrow { color: #ffe17d; font-size: 21rpx; font-weight: 800; letter-spacing: 4rpx; }
 .methods-title { position: relative; z-index: 1; max-width: 590rpx; margin-top: 20rpx; font-size: 43rpx; font-weight: 800; line-height: 1.4; }
 .methods-note { position: relative; z-index: 1; margin-top: 15rpx; color: rgba(255,255,255,.84); font-size: 24rpx; line-height: 1.7; }
 .methods-actions { position: relative; z-index: 1; display: grid; grid-template-columns: 1.25fr 1fr; gap: 14rpx; margin-top: 28rpx; }

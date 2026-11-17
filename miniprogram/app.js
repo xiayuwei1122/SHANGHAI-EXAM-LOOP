@@ -9,6 +9,6 @@ App({
   },
 
   globalData: {
-    appName: '上岸刷题簿'
+    appName: '一卷一得'
   }
 })

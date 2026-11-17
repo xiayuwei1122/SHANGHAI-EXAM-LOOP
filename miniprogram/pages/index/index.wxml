@@ -1,7 +1,7 @@
 <view class="page home-page">
   <view class="hero card">
     <view class="corn">🌽</view>
-    <view class="eyebrow">上岸刷题簿</view>
+    <view class="eyebrow">一卷一得</view>
     <view class="hero-title">把一套题刷透，<br/>比盲目追新题更重要。</view>
     <view class="hero-note">整卷检验节奏，模块拆解能力。蒙对的题，也会被单独捞出来复盘。</view>
     <view class="stats">

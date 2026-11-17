@@ -79,10 +79,10 @@
     }
   ],
   "window": {
-    "navigationBarTitleText": "上岸刷题簿",
-    "navigationBarBackgroundColor": "#fffaf0",
+    "navigationBarTitleText": "一卷一得",
+    "navigationBarBackgroundColor": "#f7f8ff",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f6f1e8",
+    "backgroundColor": "#f7f8ff",
     "backgroundTextStyle": "dark"
   },
   "sitemapLocation": "sitemap.json",

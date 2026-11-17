@@ -1,5 +1,6 @@
 <view class="page methods-page">
   <view class="methods-hero card">
+    <view class="methods-corn">🌽</view>
     <view class="methods-eyebrow">我的灵感本</view>
     <view class="methods-title">不必照格式，按自己的方式记。</view>
     <view class="methods-note">手写、圈画、加文字、贴题目图片。想认真整理时，也可以使用方法卡模板。</view>
